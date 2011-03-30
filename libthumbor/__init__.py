@@ -13,7 +13,7 @@ import base64
 
 from pyDes import *
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 class CryptoURL(object):
     def __init__(self, key):
