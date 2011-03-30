@@ -1,0 +1,54 @@
+libthumbor allows easy usage of
+[thumbor](https://github.com/globocom/thumbor/wiki) in Python.
+
+## Requirements
+
+libthumbor requires pyDes to be installed. It **does not** require thumbor to
+be installed, though.
+
+## Installing
+
+You can install it with the very common `pip install libthumbor` or
+`easy_install libthumbor`.
+
+## Using it
+
+```
+from libthumbor import CryptoURL
+
+crypto = CryptoURL(key='my-security-key')
+
+encrypted_url = crypto.generate(
+    width=300,
+    height=200,
+    smart=True,
+    image_url='/path/to/my/image.jpg'
+)
+```
+
+The full list of arguments to generate and it's default values are:
+
+```
+def generate(self,
+             meta=False,
+             width=0,
+             height=0,
+             smart=False,
+             flip_horizontal=False,
+             flip_vertical=False,
+             halign='center',
+             valign='middle',
+             crop_left=0,
+             crop_top=0,
+             crop_right=0,
+             crop_bottom=0,
+             image_url=None):
+    # Generates and returns an encrypted URL
+```
+
+## Encryption
+
+libthumbor follows the encryption direction in [thumbor security
+page](https://github.com/globocom/thumbor/wiki/Security) and will be up-to-date
+with thumbor development.
+
