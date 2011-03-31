@@ -39,3 +39,21 @@ def test_usage():
     )
 
     assert url == thumbor_url
+
+def test_thumbor_can_decrypt_lib_thumbor_generated_url():
+    key = "my-security-key"
+    image = "s.glbimg.com/et/bb/f/original/2011/03/24/VN0JiwzmOw0b0lg.jpg"
+    thumbor_crypto = Crypto(salt=key)
+
+    crypto = CryptoURL(key=key)
+
+    url = crypto.generate(
+        width=300,
+        height=200,
+        smart=True,
+        image_url=image
+    )
+
+    decrypted_url = thumbor_crypto.decrypt(url)
+    import ipdb;ipdb.set_trace()
+    assert url == thumbor_url
