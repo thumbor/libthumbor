@@ -13,38 +13,34 @@ You can install it with the very common `pip install libthumbor` or
 
 ## Using it
 
-```
-from libthumbor import CryptoURL
+    from libthumbor import CryptoURL
 
-crypto = CryptoURL(key='my-security-key')
+    crypto = CryptoURL(key='my-security-key')
 
-encrypted_url = crypto.generate(
-    width=300,
-    height=200,
-    smart=True,
-    image_url='/path/to/my/image.jpg'
-)
-```
+    encrypted_url = crypto.generate(
+        width=300,
+        height=200,
+        smart=True,
+        image_url='/path/to/my/image.jpg'
+    )
 
 The full list of arguments to generate and it's default values are:
 
-```
-def generate(self,
-             meta=False,
-             width=0,
-             height=0,
-             smart=False,
-             flip_horizontal=False,
-             flip_vertical=False,
-             halign='center',
-             valign='middle',
-             crop_left=0,
-             crop_top=0,
-             crop_right=0,
-             crop_bottom=0,
-             image_url=None):
-    # Generates and returns an encrypted URL
-```
+    def generate(self,
+                 meta=False,
+                 width=0,
+                 height=0,
+                 smart=False,
+                 flip_horizontal=False,
+                 flip_vertical=False,
+                 halign='center',
+                 valign='middle',
+                 crop_left=0,
+                 crop_top=0,
+                 crop_right=0,
+                 crop_bottom=0,
+                 image_url=None):
+        # Generates and returns an encrypted URL
 
 ## Encryption
 
