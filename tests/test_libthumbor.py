@@ -8,6 +8,9 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
+import re
+import hashlib
+
 from thumbor.crypto import Crypto
 from libthumbor import CryptoURL
 
@@ -54,6 +57,14 @@ def test_thumbor_can_decrypt_lib_thumbor_generated_url():
         image_url=image
     )
 
-    decrypted_url = thumbor_crypto.decrypt(url)
-    import ipdb;ipdb.set_trace()
-    assert url == thumbor_url
+    reg = "/([^/]+)/(.+)"
+    options = re.match(reg, url).groups()[0]
+
+    decrypted_url = thumbor_crypto.decrypt(options)
+
+    assert decrypted_url
+    assert decrypted_url['height'] == 200
+    assert decrypted_url['width'] == 300
+    assert decrypted_url['smart']
+    assert decrypted_url['image_hash'] == hashlib.md5(image).hexdigest()
+
