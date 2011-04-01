@@ -42,8 +42,7 @@ It allows users to generate safe urls easily.
     },
 
     install_requires=[
-        "pyDes"
+        "pyCrypto"
     ],
 )
-
 

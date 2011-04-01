@@ -8,6 +8,6 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
-__version__ = "0.1.2"
+__version__ = "0.2.0"
 
 from libthumbor.core import *
