@@ -12,17 +12,17 @@ import hashlib
 import base64
 
 try:
-    from pyDes import *
-    pyDesFound = True
+    from Crypto.Cipher import *
+    pyCryptoFound = True
 except ImportError:
-    pyDesFound = False
+    pyCryptoFound = False
 
 class CryptoURL(object):
     def __init__(self, key):
-        if not pyDesFound:
-            raise RuntimeError('pyDes could not be found, please install it before using libthumbor')
+        if not pyCryptoFound:
+            raise RuntimeError('pyCrypto could not be found, please install it before using libthumbor')
         self.key = key
-        self.computed_key = (key * 24)[:24]
+        self.computed_key = (key * 16)[:16]
 
     def generate(self,
                  meta=False,
@@ -76,12 +76,8 @@ class CryptoURL(object):
 
         url = "/".join(url_parts)
 
-        key = triple_des(self.computed_key,
-                         CBC, 
-                         '\0\0\0\0\0\0\0\0', 
-                         pad=None, 
-                         padmode=PAD_PKCS5)
-
-        encrypted = base64.urlsafe_b64encode(key.encrypt(url))
-
+        pad = lambda s: s + (16 - len(s) % 16) * "{"
+        cypher = AES.new(self.computed_key)
+        encrypted = base64.urlsafe_b64encode(cypher.encrypt(pad(url)))
+ 
         return '/%s/%s' % (encrypted, image_url)
