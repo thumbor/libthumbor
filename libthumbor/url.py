@@ -14,6 +14,9 @@ import hashlib
 
 def url_for(**options):
     '''Returns the url for the specified options'''
+
+    if 'image_url' not in options:
+        raise RuntimeError('The image_url argument is mandatory.')
     
     image_hash = hashlib.md5(options['image_url']).hexdigest()
 
