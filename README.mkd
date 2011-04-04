@@ -26,21 +26,26 @@ You can install it with the very common `pip install libthumbor` or
 
 The full list of arguments to generate and it's default values are:
 
-    def generate(self,
-                 meta=False,
-                 width=0,
-                 height=0,
-                 smart=False,
-                 flip_horizontal=False,
-                 flip_vertical=False,
-                 halign='center',
-                 valign='middle',
-                 crop_left=0,
-                 crop_top=0,
-                 crop_right=0,
-                 crop_bottom=0,
-                 image_url=None):
-        # Generates and returns an encrypted URL
+    meta = bool - flag that indicates that thumbor should return only meta-data on the operations it would
+                    otherwise perform;
+
+    crop = ((<int>, <int>), (<int>, <int>)) - Coordinates for manual cropping. The first pair are X and Y coordinates
+                                            for the left, top point and the second pair are X and Y coordinates
+                                            for the right, bottom point (thus forming the square to crop);
+
+    width = <int> - the width for the thumbnail;
+
+    height = <int> - the height for the thumbnail;
+
+    flip = <bool> - flag that indicates that thumbor should flip horizontally (on the vertical axis) the image;
+
+    flop = <bool> - flag that indicates that thumbor should flip vertically (on the horizontal axis) the image;
+
+    halign = 'left', 'center' or 'right' - horizontal alignment that thumbor should use for cropping;
+
+    valign = 'top', 'middle' or 'bottom' - horizontal alignment that thumbor should use for cropping;
+
+    smart = <bool> - flag that indicates that thumbor should use smart cropping;
 
 ## Encryption
 
