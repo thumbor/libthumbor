@@ -8,6 +8,8 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
-__version__ = "0.2.0"
+'''libthumbor is the library used to access thumbor's images in python'''
 
-from libthumbor.core import *
+__version__ = "0.3.0"
+
+from libthumbor.crypto import CryptoURL
