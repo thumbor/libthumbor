@@ -61,7 +61,7 @@ def test_url_width_height_1():
     Then
         I get "300x0/84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
-    url = url_for(width=300, image_url="my.server.com/some/path/to/image.jpg")
+    url = url_for(width=300, image_url=IMAGE_URL)
 
     assert url == "300x0/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -75,7 +75,7 @@ def test_url_width_height_2():
     Then
         I get "0x300/84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
-    url = url_for(height=300, image_url="my.server.com/some/path/to/image.jpg")
+    url = url_for(height=300, image_url=IMAGE_URL)
 
     assert url == "0x300/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -92,7 +92,7 @@ def test_url_width_height_3():
     '''
     url = url_for(width=200,
                   height=300,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "200x300/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -111,7 +111,7 @@ def test_smart_url():
     url = url_for(width=200,
                   height=300,
                   smart=True,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "200x300/smart/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -126,7 +126,7 @@ def test_flip_1():
         I get "-0x0/84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
     url = url_for(flip=True,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "-0x0/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -143,7 +143,7 @@ def test_flip_2():
     '''
     url = url_for(flip=True,
                   width=200,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "-200x0/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -158,7 +158,7 @@ def test_flop_1():
         I get "0x-0/84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
     url = url_for(flop=True,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "0x-0/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -175,7 +175,7 @@ def test_flop_2():
     '''
     url = url_for(flop=True,
                   height=200,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "0x-200/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -192,7 +192,7 @@ def test_flip_flop():
     '''
     url = url_for(flip=True,
                   flop=True,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "-0x-0/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -213,7 +213,7 @@ def test_flip_flop2():
                   flop=True,
                   width=200,
                   height=300,
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == "-200x-300/84996242f65a4d864aceb125e1c4c5ba", url
 
@@ -228,7 +228,7 @@ def test_horizontal_alignment():
         I get "left/84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
     url = url_for(halign='left',
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == 'left/84996242f65a4d864aceb125e1c4c5ba', url
 
@@ -243,7 +243,7 @@ def test_horizontal_alignment2():
         I get "84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
     url = url_for(halign='center',
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == '84996242f65a4d864aceb125e1c4c5ba', url
 
@@ -258,7 +258,7 @@ def test_vertical_alignment():
         I get "top/84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
     url = url_for(valign='top',
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == 'top/84996242f65a4d864aceb125e1c4c5ba', url
 
@@ -273,7 +273,7 @@ def test_vertical_alignment2():
         I get "84996242f65a4d864aceb125e1c4c5ba" as URL
     '''
     url = url_for(valign='middle',
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == '84996242f65a4d864aceb125e1c4c5ba', url
 
@@ -290,7 +290,7 @@ def test_both_alignments():
     '''
     url = url_for(halign='left',
                   valign='top',
-                  image_url="my.server.com/some/path/to/image.jpg")
+                  image_url=IMAGE_URL)
 
     assert url == 'left/top/84996242f65a4d864aceb125e1c4c5ba', url
 
@@ -313,4 +313,69 @@ def test_proper_valigns():
                            ' are valid values for vertical alignment.'
         return True
     assert False, "Should not have gotten this far."
+
+def test_proper_meta():
+    '''test_proper_meta
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a 'meta' flag
+    When
+        I ask my library for an URL
+    Then
+        I get "meta/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(meta=True,
+                  image_url=IMAGE_URL)
+
+    assert url == 'meta/84996242f65a4d864aceb125e1c4c5ba', url
+
+def test_manual_crop_1():
+    '''test_manual_crop_1
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a manual crop left-top point of (10, 20)
+        And a manual crop right-bottom point of (30, 40)
+    When
+        I ask my library for an URL
+    Then
+        I get "10x20:30x40/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(crop=((10, 20), (30, 40)),
+                  image_url=IMAGE_URL)
+
+    assert url == '10x20:30x40/84996242f65a4d864aceb125e1c4c5ba', url
+
+def test_manual_crop_2():
+    '''test_manual_crop_2
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a manual crop left-top point of (0, 0)
+        And a manual crop right-bottom point of (0, 0)
+    When
+        I ask my library for an URL
+    Then
+        I get "84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(crop=((0, 0), (0, 0)),
+                  image_url=IMAGE_URL)
+
+    assert url == '84996242f65a4d864aceb125e1c4c5ba', url
+
+def test_smart_after_alignments():
+    '''test_smart_after_alignments
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a 'smart' flag
+        And a 'left' horizontal alignment option
+    When
+        I ask my library for an URL
+    Then
+        I get "left/smart/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(smart=True,
+                  halign='left',
+                  image_url=IMAGE_URL)
+
+    assert url == 'left/smart/84996242f65a4d864aceb125e1c4c5ba', url
+
 

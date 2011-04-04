@@ -47,6 +47,19 @@ def url_for(**options):
 
     url_parts = []
 
+    if options.get('meta', False):
+        url_parts.append('meta')
+
+    crop = options.get('crop', None)
+    if crop:
+        crop_left = crop[0][0]
+        crop_top = crop[0][1]
+        crop_right = crop[1][0]
+        crop_bottom = crop[1][1]
+
+        if crop_left > 0 or crop_top > 0 or crop_bottom > 0 or crop_right > 0:
+            url_parts.append("%sx%s:%sx%s" % (crop_left, crop_top, crop_right, crop_bottom))
+
     calculate_width_and_height(url_parts, options)
 
     halign = options.get('halign', 'center')
