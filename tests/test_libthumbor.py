@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # libthumbor - python extension to thumbor
-# https://github.com/heynemann/libthumbor/wiki
+# http://github.com/heynemann/libthumbor
 
 # Licensed under the MIT license: 
 # http://www.opensource.org/licenses/mit-license

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # libthumbor - python extension to thumbor
-# https://github.com/heynemann/libthumbor/wiki
+# http://github.com/heynemann/libthumbor
 
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license
@@ -58,7 +58,12 @@ def url_for(**options):
         crop_bottom = crop[1][1]
 
         if crop_left > 0 or crop_top > 0 or crop_bottom > 0 or crop_right > 0:
-            url_parts.append("%sx%s:%sx%s" % (crop_left, crop_top, crop_right, crop_bottom))
+            url_parts.append("%sx%s:%sx%s" % (
+                crop_left,
+                crop_top,
+                crop_right,
+                crop_bottom
+            ))
 
     calculate_width_and_height(url_parts, options)
 
