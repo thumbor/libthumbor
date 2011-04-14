@@ -11,7 +11,7 @@
 '''Generic view for create thumbor encrypted urls.'''
 import logging
 
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponse
 from django.conf import settings
 
 from libthumbor.crypto import CryptoURL
@@ -19,10 +19,13 @@ from libthumbor.crypto import CryptoURL
 THUMBOR_SECURITY_KEY = getattr(settings, 'THUMBOR_SECURITY_KEY', 'my-security-key')
 
 def generate_url(request):
-    crypto = CryptoURL(THUMBOR_SECURITY_KEY)
-    try:
-        args = request.GET if request.method == 'GET' else request.POST
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
 
+    crypto = CryptoURL(THUMBOR_SECURITY_KEY)
+    
+    try:
+        args = request.GET
         # convert Django QueryDict to a python dict
         args = dict(zip(map(str, args.keys()), args.values()))
 
@@ -35,8 +38,8 @@ def generate_url(request):
         if 'crop_top' in args or 'crop_left' in args or 'crop_right' in args or 'crop_bottom' in args:
             args['crop'] = ((int(args['crop_left']), int(args['crop_top'])),
                     (int(args['crop_right']), int(args['crop_bottom'])))
-
+        
         return HttpResponse(crypto.generate(**args), mimetype="text/plain")
-    except (RuntimeError, ValueError, KeyError), e:
+    except (ValueError, KeyError), e:
         logging.warning(str(e))
-    raise Http404
+        return HttpResponseBadRequest()

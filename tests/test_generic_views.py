@@ -18,62 +18,73 @@ os.environ["DJANGO_SETTINGS_MODULE"] = 'testproj.settings'
 try:
     from django.conf import settings
     from django.test import TestCase
+    from django.http import QueryDict
     DJANGO_PRESENT = True
 except ImportError:
     DJANGO_PRESENT = False
 
 if DJANGO_PRESENT:
 
+    HTTP_NOT_FOUND = 404
+    HTTP_METHOD_NOT_ALLOWED = 405
+    HTTP_OK = 200
+    HTTP_BAD_REQUEST = 400
+
     class GenericViewsTestCase(TestCase):
+
+        def setUp(self):
+            self.url_query = QueryDict("", mutable=True)
 
         def test_without_url_param(self):
             response = self.client.get('/gen_url/')
-            assert 404 == response.status_code, "Got %d" % response.status_code
+            assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
 
         def test_generate_url_with_params_via_post(self):
             image_args = {'image_url': 'globo.com/media/img/my_image.jpg'}
-            crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
-
+            
             response = self.client.post('/gen_url/', image_args)
 
-            assert 200 == response.status_code, "Got %d" % response.status_code
-            assert response.content == crypto.generate(**image_args)
+            assert HTTP_METHOD_NOT_ALLOWED == response.status_code, "Got %d" % response.status_code
 
         def test_generate_url_with_params_via_get(self):
-            image_args = {'image_url': 'globo.com/media/img/my_image.jpg'}
             crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
+            image_args = {'image_url': 'globo.com/media/img/my_image.jpg'}
+            self.url_query.update(image_args)
+            
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
-            response = self.client.get('/gen_url/?image_url=' + image_args['image_url'])
-
-            assert 200 == response.status_code, "Got %d" % response.status_code
+            assert HTTP_OK == response.status_code, "Got %d" % response.status_code
             assert response.content == crypto.generate(**image_args)
 
         def test_passing_invalid_aligns(self):
-            image_args = {'image_url': 'globo.com/media/img/my_image.jpg', 'halign': 'sss'}
+            self.url_query.update({
+                'image_url': 'globo.com/media/img/my_image.jpg',
+                'halign': 'sss'
+            })
 
-            response = self.client.post('/gen_url/', image_args)
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
-            assert 404 == response.status_code, "Got %d" % response.status_code
+            assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
 
         def test_passing_only_one_crop_value(self):
-            image_args = {
+            self.url_query.update({
                 'image_url': 'globo.com/media/img/my_image.jpg',
                 'crop_left': 100,
-            }
+            })
 
-            response = self.client.post('/gen_url/', image_args)
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
-            assert 404 == response.status_code, "Got %d" % response.status_code
+            assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
 
         def test_passing_only_one_crop_with_invalid_value(self):
-            image_args = {
+            self.url_query.update({
                 'image_url': 'globo.com/media/img/my_image.jpg',
                 'crop_top': 'bla',
-            }
+            })
 
-            response = self.client.post('/gen_url/', image_args)
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
-            assert 404 == response.status_code, "Got %d" % response.status_code
+            assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
 
         def test_passing_all_params(self):
             image_args = {
@@ -87,18 +98,18 @@ if DJANGO_PRESENT:
                 'flip': True,
                 'flop': True
             }
-            image_params = dict(image_args)
-            image_params.update({
+            self.url_query.update(image_args)
+            self.url_query.update({
                 'crop_top': 100,
                 'crop_left': 100,
                 'crop_bottom': 200,
                 'crop_right': 200
             })
-            image_args['crop'] = ((100,100),(200,200))
+            image_args.update({'crop': ((100,100), (200,200)) })
 
             crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
 
-            response = self.client.post('/gen_url/', image_params)
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
-            assert 200 == response.status_code, "Got %d" % response.status_code
+            assert HTTP_OK == response.status_code, "Got %d" % response.status_code
             assert response.content == crypto.generate(**image_args)

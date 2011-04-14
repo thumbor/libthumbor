@@ -46,7 +46,7 @@ def test_url_raises_if_no_url():
     '''
     try:
         url_for()
-    except RuntimeError, err:
+    except ValueError, err:
         assert str(err) == 'The image_url argument is mandatory.'
         return True
     assert False, 'Should not have gotten this far'

@@ -43,7 +43,7 @@ def url_for(**options):
     '''Returns the url for the specified options'''
 
     if 'image_url' not in options:
-        raise RuntimeError('The image_url argument is mandatory.')
+        raise ValueError('The image_url argument is mandatory.')
 
     url_parts = []
 
