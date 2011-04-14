@@ -56,6 +56,28 @@ if DJANGO_PRESENT:
             assert HTTP_OK == response.status_code, "Got %d" % response.status_code
             assert response.content == crypto.generate(**image_args)
 
+        def test_passing_invalid_value_for_width(self):
+            self.url_query.update({
+                'image_url': 'globo.com/media/img/my_image.jpg',
+                'width': 1.2
+            })
+
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
+
+            assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
+            assert "The width value '1.2' is not an integer." == response.content
+
+        def test_passing_invalid_value_for_height(self):
+            self.url_query.update({
+                'image_url': 'globo.com/media/img/my_image.jpg',
+                'height': 's'
+            })
+
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
+
+            assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
+            assert "The height value 's' is not an integer." == response.content
+
         def test_passing_invalid_aligns(self):
             self.url_query.update({
                 'image_url': 'globo.com/media/img/my_image.jpg',
@@ -75,11 +97,28 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
+            assert "Missing values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' values." == response.content
 
         def test_passing_only_one_crop_with_invalid_value(self):
             self.url_query.update({
                 'image_url': 'globo.com/media/img/my_image.jpg',
                 'crop_top': 'bla',
+                'crop_left': 200,
+                'crop_right': '1',
+                'crop_bottom': 'blas'
+            })
+
+            response = self.client.get('/gen_url/?' + self.url_query.urlencode())
+
+            assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
+            assert "Invalid values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' to be integers." == response.content
+
+        def test_passing_various_erroneous_values(self):
+            self.url_query.update({
+                'image_url': 'globo.com/media/img/my_image.jpg',
+                'crop_left': 100,
+                'width': 'aaa',
+                'height': 123
             })
 
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
