@@ -17,7 +17,7 @@ from django.conf import settings
 from libthumbor.crypto import CryptoURL
 
 THUMBOR_SECURITY_KEY = getattr(settings, 'THUMBOR_SECURITY_KEY', 'my-security-key')
-
+THUMBOR_SERVER = getattr(settings, 'THUMBOR_SERVER', 'http://localhost:8888/')
 
 def generate_url(request):
     if request.method != 'GET':
@@ -56,7 +56,7 @@ def generate_url(request):
         return HttpResponseBadRequest(error_message)
 
     try:
-        return HttpResponse(crypto.generate(**args), mimetype="text/plain")
+        return HttpResponse(THUMBOR_SERVER + crypto.generate(**args)[1:], mimetype="text/plain")
     except (ValueError, KeyError), e:
         error_message = str(e)
         logging.warning(error_message)

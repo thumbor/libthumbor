@@ -54,7 +54,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_OK == response.status_code, "Got %d" % response.status_code
-            assert response.content == crypto.generate(**image_args)
+            assert response.content == settings.THUMBOR_SERVER + crypto.generate(**image_args)[1:]
 
         def test_passing_invalid_value_for_width(self):
             self.url_query.update({
@@ -151,4 +151,4 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_OK == response.status_code, "Got %d" % response.status_code
-            assert response.content == crypto.generate(**image_args)
+            assert response.content == settings.THUMBOR_SERVER + crypto.generate(**image_args)[1:]

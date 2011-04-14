@@ -84,3 +84,4 @@ INSTALLED_APPS = (
 logging.basicConfig(level=logging.DEBUG)
 
 THUMBOR_SECURITY_KEY = 'my-security-key'
+THUMBOR_SERVER = 'http://localhost:8888/'
