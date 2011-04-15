@@ -26,7 +26,6 @@ def generate_url(request):
     crypto = CryptoURL(THUMBOR_SECURITY_KEY)
     
     args = request.GET
-    # convert Django QueryDict to a python dict
     args = dict(zip(map(str, args.keys()), args.values()))
     error_message = None
 
