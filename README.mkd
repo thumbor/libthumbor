@@ -1,5 +1,5 @@
 libthumbor allows easy usage of
-[thumbor](http://github.com/globocom/thumbor) in Python.
+[thumbor](http://github.com/globocom/thumbor) in Python. Check the docs for django integration.
 
 ## Using it
 
