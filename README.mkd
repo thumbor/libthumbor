@@ -53,3 +53,16 @@ libthumbor follows the encryption direction in [thumbor security
 page](https://github.com/globocom/thumbor/wiki/Security) and will be up-to-date
 with thumbor development.
 
+## Contributions
+
+### Bernardo Heynemann
+
+* Generic URL encryption
+
+### Rafael Caricio
+
+* Django Generic View and URL
+
+### Fábio Costa
+
+* Django Generic View and URL
