@@ -64,6 +64,8 @@ def url_for(**options):
                 crop_right,
                 crop_bottom
             ))
+    if options.get('fit_in', None):
+        url_parts.append('fit-in')
 
     calculate_width_and_height(url_parts, options)
 

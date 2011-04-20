@@ -58,6 +58,7 @@ def test_decription2():
             horizontal_flip = False
             vertical_flip = False
             smart = False
+            fit_in = False
             meta = False
             crop['left'] = 0
             crop['top'] = 0
@@ -76,6 +77,7 @@ def test_decription2():
     assert decrypted['horizontal_flip'] == False
     assert decrypted['vertical_flip'] == False
     assert decrypted['smart'] == False
+    assert decrypted['fit_in'] == False
     assert decrypted['meta'] == False
     assert decrypted['crop']['left'] == 0
     assert decrypted['crop']['top'] == 0
@@ -107,6 +109,28 @@ def test_decryption3():
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['meta'] == True
+    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
+
+def test_decryption_fit_in():
+    '''test_decryption_fit_in
+    Given
+        A security key of 'my-security-key'
+        And an image URL of "my.server.com/some/path/to/image.jpg"
+        And the fit-in flag
+    When
+        I ask my library for an encrypted URL
+        And I call the aforementioned 'decrypt_in_thumbor' method
+    Then
+        I get a decrypted dictionary that contains the following:
+            fit-in = True
+            image_hash = 84996242f65a4d864aceb125e1c4c5ba
+    '''
+
+    crypto = CryptoURL(KEY)
+    url = crypto.generate(image_url=IMAGE_URL, fit_in=True)
+    decrypted = decrypt_in_thumbor(url)
+
+    assert decrypted['fit_in'] == True
     assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
 
 def test_decryption4():

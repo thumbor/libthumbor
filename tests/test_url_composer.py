@@ -115,6 +115,25 @@ def test_smart_url():
 
     assert url == "200x300/smart/84996242f65a4d864aceb125e1c4c5ba", url
 
+def test_fit_in_url():
+    '''test_fit_in_url
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a width of 200
+        And a height of 300
+        And the fit-in flag
+    When
+        I ask my library for an URL
+    Then
+        I get "fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width=200,
+                  height=300,
+                  fit_in=True,
+                  image_url=IMAGE_URL)
+
+    assert url == "fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba", url
+
 def test_flip_1():
     '''test_flip_1
     Given
