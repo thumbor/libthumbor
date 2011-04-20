@@ -10,7 +10,7 @@
 
 '''Module that configures setuptools to package libthumbor'''
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from libthumbor import __version__
 
 setup(
@@ -37,7 +37,7 @@ It allows users to generate safe urls easily.
                    'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                    'Topic :: Multimedia :: Graphics :: Presentation'
     ],
-    packages = ['libthumbor'],
+    packages = find_packages(),
     package_dir = {"libthumbor": "libthumbor"},
     include_package_data = True,
     package_data = {
