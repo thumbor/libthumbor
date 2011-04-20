@@ -20,14 +20,18 @@ def test_usage():
     thumbor_crypto = Crypto(salt=key)
 
     thumbor_options = thumbor_crypto.encrypt(
-        300,
-        200,
-        True,
-        False,
-        False,
-        'center',
-        'middle',
-        0, 0, 0, 0,
+        width=300,
+        height=200,
+        smart=True,
+        fit_in=False,
+        flip_horizontal=False,
+        flip_vertical=False,
+        halign='center',
+        valign='middle',
+        crop_left=0,
+        crop_top=0,
+        crop_right=0,
+        crop_bottom=0,
         image=image
     )
     thumbor_url = "/%s/%s" % (thumbor_options, image)
