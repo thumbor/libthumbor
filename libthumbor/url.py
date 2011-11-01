@@ -15,6 +15,7 @@ import hashlib
 AVAILABLE_HALIGN = ['left', 'center', 'right']
 AVAILABLE_VALIGN = ['top', 'middle', 'bottom']
 
+
 def calculate_width_and_height(url_parts, options):
     '''Appends width and height information to url'''
     width = options.get('width', 0)
@@ -39,9 +40,27 @@ def calculate_width_and_height(url_parts, options):
     if width or height:
         url_parts.append('%sx%s' % (width, height))
 
+
 def url_for(**options):
     '''Returns the url for the specified options'''
 
+    url_parts = get_url_parts(**options)
+    image_hash = hashlib.md5(options['image_url']).hexdigest()
+    url_parts.append(image_hash)
+
+    return "/".join(url_parts)
+
+
+def unsafe_url(**options):
+    '''Returns the unsafe url with the specified options'''
+    url_parts = get_url_parts(**options)
+    url_parts.append(options['image_url'])
+    url_parts.insert(0, 'unsafe')
+
+    return '/'.join(url_parts)
+
+
+def get_url_parts(**options):
     if 'image_url' not in options:
         raise ValueError('The image_url argument is mandatory.')
 
@@ -87,7 +106,4 @@ def url_for(**options):
     if options.get('smart', False):
         url_parts.append('smart')
 
-    image_hash = hashlib.md5(options['image_url']).hexdigest()
-    url_parts.append(image_hash)
-
-    return "/".join(url_parts)
+    return url_parts

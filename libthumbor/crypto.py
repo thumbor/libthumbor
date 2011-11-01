@@ -18,7 +18,7 @@ try:
 except ImportError:
     PYCRYPTOFOUND = False
 
-from libthumbor.url import url_for
+from libthumbor.url import url_for, unsafe_url
 
 class CryptoURL(object):
     '''Class responsible for generating encrypted URLs for thumbor'''
@@ -34,12 +34,13 @@ class CryptoURL(object):
     def generate(self, **options):
         '''Generates an encrypted URL with the specified options'''
 
-        url = url_for(**options)
+        if 'unsafe' in options:
+            return unsafe_url(**options)
+        else:
+            url = url_for(**options)
 
-        pad = lambda s: s + (16 - len(s) % 16) * "{"
-        cypher = AES.new(self.computed_key)
-        encrypted = base64.urlsafe_b64encode(cypher.encrypt(pad(url)))
+            pad = lambda s: s + (16 - len(s) % 16) * "{"
+            cypher = AES.new(self.computed_key)
+            encrypted = base64.urlsafe_b64encode(cypher.encrypt(pad(url)))
 
-        return "/%s/%s" % (encrypted, options['image_url'])
-
-
+            return "/%s/%s" % (encrypted, options['image_url'])
