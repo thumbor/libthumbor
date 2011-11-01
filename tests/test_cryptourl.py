@@ -9,6 +9,7 @@
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
 '''libthumbor cryptography tests'''
+from unittest import TestCase
 
 from thumbor.crypto import Crypto
 
@@ -167,7 +168,7 @@ def test_decryption5():
     Then
         I get a decrypted dictionary that contains the following:
             flip_horizontally = True
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba 
+            image_hash = 84996242f65a4d864aceb125e1c4c5ba
     '''
 
     crypto = CryptoURL(KEY)
@@ -189,7 +190,7 @@ def test_decryption6():
     Then
         I get a decrypted dictionary that contains the following:
             flip_vertically = True
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba 
+            image_hash = 84996242f65a4d864aceb125e1c4c5ba
     '''
 
     crypto = CryptoURL(KEY)
@@ -273,3 +274,9 @@ def test_decryption9():
     assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
 
 
+class GenerateWithUnsafeTestCase(TestCase):
+
+    def test_should_pass_unsafe_to_generate_and_get_an_unsafe_url(self):
+        crypto = CryptoURL(KEY)
+        url = crypto.generate(image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=True)
+        self.assertTrue(url.startswith('unsafe'), "url should starts with unsafe")

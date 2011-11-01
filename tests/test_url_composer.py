@@ -9,10 +9,12 @@
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
 '''libthumbor URL composer tests'''
+from unittest import TestCase
 
 from thumbor.crypto import Crypto
 
 from libthumbor.url import url_for
+from libthumbor.url import unsafe_url
 
 IMAGE_URL = 'my.server.com/some/path/to/image.jpg'
 IMAGE_MD5 = '84996242f65a4d864aceb125e1c4c5ba'
@@ -398,3 +400,13 @@ def test_smart_after_alignments():
     assert url == 'left/smart/84996242f65a4d864aceb125e1c4c5ba', url
 
 
+class UnsafeUrlTestCase(TestCase):
+
+    def test_should_return_a_valid_unsafe_url_with_no_params(self):
+        self.assertEqual('unsafe/%s' % IMAGE_URL, unsafe_url(image_url=IMAGE_URL))
+
+    def test_should_return_an_unsafe_url_with_width_and_height(self):
+        self.assertEqual('unsafe/100x140/%s' % IMAGE_URL, unsafe_url(image_url=IMAGE_URL, width=100, height=140))
+
+    def test_should_return_an_unsafe_url_with_crop_and_smart(self):
+        self.assertEqual('unsafe/100x140/smart/%s' % IMAGE_URL, unsafe_url(image_url=IMAGE_URL, width=100, height=140, smart=True))
