@@ -34,7 +34,7 @@ class CryptoURL(object):
     def generate(self, **options):
         '''Generates an encrypted URL with the specified options'''
 
-        if 'unsafe' in options:
+        if options.get('unsafe', False):
             return unsafe_url(**options)
         else:
             url = url_for(**options)
