@@ -276,7 +276,13 @@ def test_decryption9():
 
 class GenerateWithUnsafeTestCase(TestCase):
 
+    def setUp(self):
+        self.crypto = CryptoURL(KEY)
+
     def test_should_pass_unsafe_to_generate_and_get_an_unsafe_url(self):
-        crypto = CryptoURL(KEY)
-        url = crypto.generate(image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=True)
+        url = self.crypto.generate(image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=True)
         self.assertTrue(url.startswith('unsafe'), "url should starts with unsafe")
+
+    def test_should_not_get_an_unsafe_url_when_unsafe_is_false(self):
+        url = self.crypto.generate(image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=False)
+        self.assertFalse(url.startswith('unsafe'), "url should not starts with unsafe")
