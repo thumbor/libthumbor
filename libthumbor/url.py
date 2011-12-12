@@ -106,4 +106,10 @@ def get_url_parts(**options):
     if options.get('smart', False):
         url_parts.append('smart')
 
+    if options.get('filters', False):
+        filters_string = ['filters']
+        for filter_value in options['filters']:
+            filters_string.append(filter_value)
+        url_parts.append(':'.join(filters_string))
+
     return url_parts
