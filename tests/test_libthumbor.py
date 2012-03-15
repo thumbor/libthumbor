@@ -23,6 +23,7 @@ def test_usage():
         width=300,
         height=200,
         smart=True,
+        adaptive=False,
         fit_in=False,
         flip_horizontal=False,
         flip_vertical=False,
@@ -32,6 +33,7 @@ def test_usage():
         crop_top=0,
         crop_right=0,
         crop_bottom=0,
+        filters=[],
         image=image
     )
     thumbor_url = "/%s/%s" % (thumbor_options, image)
