@@ -273,6 +273,30 @@ def test_decryption9():
     assert decrypted['crop']['bottom'] == 40
     assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
 
+def test_decryption10():
+    '''test_decryption10
+    Given
+        A security key of 'my-security-key'
+        And an image URL of "my.server.com/some/path/to/image.jpg"
+        And a quality filter with 20% quality
+        And a brightness filter with 10% improvement
+    When
+        I ask my library for an encrypted URL
+        And I call the aforementioned 'decrypt_in_thumbor' method
+    Then
+        I get a decrypted dictionary that contains the following:
+            filters = ["quality(20)", "brightness(10)"]
+            image_hash = 84996242f65a4d864aceb125e1c4c5ba
+    '''
+
+    crypto = CryptoURL(KEY)
+    url = crypto.generate(image_url=IMAGE_URL, filters=["quality(20)", "brightness(10)"])
+    decrypted = decrypt_in_thumbor(url)
+
+    assert "quality(20)" in decrypted['filters']
+    assert "brightness(10)" in decrypted['filters']
+    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
+
 
 class GenerateWithUnsafeTestCase(TestCase):
 
