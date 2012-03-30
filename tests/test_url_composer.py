@@ -98,6 +98,82 @@ def test_url_width_height_3():
 
     assert url == "200x300/84996242f65a4d864aceb125e1c4c5ba", url
 
+def test_url_width_height_4():
+    '''test_url_width_height_4
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a width of orig
+    When
+        I ask my library for an URL
+    Then
+        I get "origx0/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width="orig", image_url=IMAGE_URL)
+
+    assert url == "origx0/84996242f65a4d864aceb125e1c4c5ba", url
+
+def test_url_width_height_5():
+    '''test_url_width_height_5
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a height of orig
+    When
+        I ask my library for an URL
+    Then
+        I get "0xorig/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(height="orig", image_url=IMAGE_URL)
+
+    assert url == "0xorig/84996242f65a4d864aceb125e1c4c5ba", url
+
+def test_url_width_height_6():
+    '''test_url_width_height_6
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a width of 100
+        And a height of orig
+    When
+        I ask my library for an URL
+    Then
+        I get "100xorig/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width=100, height="orig", image_url=IMAGE_URL)
+
+    assert url == "100xorig/84996242f65a4d864aceb125e1c4c5ba", url
+
+def test_url_width_height_7():
+    '''test_url_width_height_7
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a height of 100
+        And a width of orig
+    When
+        I ask my library for an URL
+    Then
+        I get "origx100/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width="orig", height=100, image_url=IMAGE_URL)
+
+    assert url == "origx100/84996242f65a4d864aceb125e1c4c5ba", url
+
+def test_url_width_height_8():
+    '''test_url_width_height_8
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a height of orig
+        And a width of orig
+    When
+        I ask my library for an URL
+    Then
+        I get "origxorig/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width="orig", height="orig", image_url=IMAGE_URL)
+
+    assert url == "origxorig/84996242f65a4d864aceb125e1c4c5ba", url
+
+
+
+
 def test_smart_url():
     '''test_smart_url
     Given
