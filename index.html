@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Libthumbor by heynemann</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Libthumbor</h1>
+<p>Python's extensions to thumbor. These are used to generate safe urls among others.</p>
+        <p class="view"><a href="https://github.com/heynemann/libthumbor">View the Project on GitHub <small>heynemann/libthumbor</small></a></p>
+        <ul>
+          <li><a href="https://github.com/heynemann/libthumbor/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/heynemann/libthumbor/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/heynemann/libthumbor">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>libthumbor allows easy usage of
+<a href="http://github.com/globocom/thumbor">thumbor</a> in Python. Check the docs for django integration.</p>
+
+<h2>Using it</h2>
+
+<pre><code>from libthumbor import CryptoURL
+
+crypto = CryptoURL(key='my-security-key')
+
+encrypted_url = crypto.generate(
+    width=300,
+    height=200,
+    smart=True,
+    image_url='/path/to/my/image.jpg'
+)
+</code></pre>
+
+<h2>Docs</h2>
+
+<p>Check the wiki for more information on using libthumbor.</p>
+
+<h2>Contributions</h2>
+
+<h3>Bernardo Heynemann</h3>
+
+<ul>
+<li>Generic URL encryption</li>
+</ul><h3>Rafael Caricio</h3>
+
+<ul>
+<li>Django Generic View and URL</li>
+</ul><h3>Fábio Costa</h3>
+
+<ul>
+<li>Django Generic View and URL</li>
+</ul>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/heynemann">heynemann</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
