@@ -17,11 +17,11 @@ install:
     - export PYTHONPATH=$PYTHONPATH:/usr/lib/pyshared/python2.7/
     - export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/
 
-    # verify both requirements were met
-    - INSTALLDIR=$(python -c "import os; import thumbor; print(os.path.dirname(thumbor.__file__))")
-
     # install python requirements
     - pip install -r test_requirements.txt --use-mirrors
+
+    # verify both requirements were met
+    - INSTALLDIR=$(python -c "import os; import thumbor; print(os.path.dirname(thumbor.__file__))")
 
 script:
     # weird travis-ci python paths
