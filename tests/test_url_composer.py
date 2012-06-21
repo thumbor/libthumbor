@@ -171,9 +171,6 @@ def test_url_width_height_8():
 
     assert url == "origxorig/84996242f65a4d864aceb125e1c4c5ba", url
 
-
-
-
 def test_smart_url():
     '''test_smart_url
     Given
