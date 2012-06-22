@@ -20,13 +20,14 @@ except ImportError:
 
 from libthumbor.url import url_for, unsafe_url
 
+
 class CryptoURL(object):
     '''Class responsible for generating encrypted URLs for thumbor'''
 
     def __init__(self, key):
         '''Initializes the encryptor with the proper key'''
         if not PYCRYPTOFOUND:
-            raise RuntimeError('pyCrypto could not be found,' + \
+            raise RuntimeError('pyCrypto could not be found,' +
                                ' please install it before using libthumbor')
         self.key = key
         self.computed_key = (key * 16)[:16]

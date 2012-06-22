@@ -92,10 +92,10 @@ def get_url_parts(**options):
     valign = options.get('valign', 'middle')
 
     if not halign in AVAILABLE_HALIGN:
-        raise ValueError('Only "left", "center" and "right" are' + \
+        raise ValueError('Only "left", "center" and "right" are' +
                          ' valid values for horizontal alignment.')
     if not valign in AVAILABLE_VALIGN:
-        raise ValueError('Only "top", "middle" and "bottom" are' + \
+        raise ValueError('Only "top", "middle" and "bottom" are' +
                          ' valid values for vertical alignment.')
 
     if halign != 'center':

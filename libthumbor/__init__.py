@@ -4,7 +4,7 @@
 # libthumbor - python extension to thumbor
 # http://github.com/heynemann/libthumbor
 
-# Licensed under the MIT license: 
+# Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
