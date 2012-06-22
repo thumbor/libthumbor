@@ -11,20 +11,26 @@
 '''Generic view for create thumbor encrypted urls.'''
 import logging
 
-from django.http import Http404, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponse
 from django.conf import settings
 
 from libthumbor.crypto import CryptoURL
 
-THUMBOR_SECURITY_KEY = getattr(settings, 'THUMBOR_SECURITY_KEY', 'my-security-key')
+THUMBOR_SECURITY_KEY = getattr(
+    settings,
+    'THUMBOR_SECURITY_KEY',
+    'my-security-key'
+)
+
 THUMBOR_SERVER = getattr(settings, 'THUMBOR_SERVER', 'http://localhost:8888/')
+
 
 def generate_url(request):
     if request.method != 'GET':
         return HttpResponseNotAllowed(['GET'])
 
     crypto = CryptoURL(THUMBOR_SECURITY_KEY)
-    
+
     args = request.GET
     args = dict(zip(map(str, args.keys()), args.values()))
     error_message = None
@@ -33,13 +39,15 @@ def generate_url(request):
         if 'width' in args:
             args['width'] = int(args['width'])
     except ValueError, e:
-        error_message = "The width value '%s' is not an integer." % args['width']
+        error_message = "The width value '%s' is not an integer." % \
+            args['width']
 
     try:
         if 'height' in args:
             args['height'] = int(args['height'])
     except ValueError, e:
-        error_message = "The height value '%s' is not an integer." % args['height']
+        error_message = "The height value '%s' is not an integer." % \
+            args['height']
 
     try:
         if 'crop_top' in args or 'crop_left' in args or 'crop_right' in args or 'crop_bottom' in args:
@@ -60,5 +68,3 @@ def generate_url(request):
         error_message = str(e)
         logging.warning(error_message)
         return HttpResponseBadRequest(error_message)
-
-
