@@ -11,7 +11,7 @@
 '''libthumbor URL composer tests'''
 from unittest import TestCase
 
-from thumbor.crypto import Crypto
+from thumbor.crypto import Cryptor
 
 from libthumbor.url import url_for
 from libthumbor.url import unsafe_url
@@ -21,7 +21,7 @@ IMAGE_MD5 = '84996242f65a4d864aceb125e1c4c5ba'
 
 def decrypt_in_thumbor(key, encrypted):
     '''Uses thumbor to decrypt libthumbor's encrypted URL'''
-    crypto = Crypto(key)
+    crypto = Cryptor(key)
     return crypto.decrypt(encrypted)
 
 def test_no_options_specified():

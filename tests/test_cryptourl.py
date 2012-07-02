@@ -11,7 +11,7 @@
 '''libthumbor cryptography tests'''
 from unittest import TestCase
 
-from thumbor.crypto import Crypto
+from thumbor.crypto import Cryptor
 
 from libthumbor.crypto import CryptoURL
 
@@ -21,8 +21,8 @@ KEY = 'my-security-key'
 def decrypt_in_thumbor(url):
     '''Uses thumbor to decrypt libthumbor's encrypted URL'''
     encrypted = url.split('/')[1]
-    crypto = Crypto(KEY)
-    return crypto.decrypt(encrypted)
+    cryptor = Cryptor(KEY)
+    return cryptor.decrypt(encrypted)
 
 def test_decryption1():
     '''test_decryption1
@@ -39,7 +39,7 @@ def test_decryption1():
         as url
     '''
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, width=300, height=200)
+    url = crypto.generate(image_url=IMAGE_URL, width=300, height=200, old=True)
 
     assert url == '/l42l54VqaV_J-EcB5quNMP6CnsN9BX7htrh-QbPuDv0C7adUXX7' + \
                   'LTo6DHm_woJtZ/my.server.com/some/path/to/image.jpg'
@@ -72,7 +72,7 @@ def test_decription2():
             image_hash = 84996242f65a4d864aceb125e1c4c5ba
     '''
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, width=300, height=200)
+    url = crypto.generate(image_url=IMAGE_URL, width=300, height=200, old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['horizontal_flip'] == False
@@ -106,7 +106,7 @@ def test_decryption3():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, meta=True)
+    url = crypto.generate(image_url=IMAGE_URL, meta=True, old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['meta'] == True
@@ -128,7 +128,7 @@ def test_decryption_fit_in():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, fit_in=True)
+    url = crypto.generate(image_url=IMAGE_URL, fit_in=True, old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['fit_in'] == True
@@ -150,7 +150,7 @@ def test_decryption4():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, smart=True)
+    url = crypto.generate(image_url=IMAGE_URL, smart=True, old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['smart'] == True
@@ -172,7 +172,7 @@ def test_decryption5():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, flip=True)
+    url = crypto.generate(image_url=IMAGE_URL, flip=True, old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['horizontal_flip'] == True
@@ -194,7 +194,7 @@ def test_decryption6():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, flop=True)
+    url = crypto.generate(image_url=IMAGE_URL, flop=True, old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['vertical_flip'] == True
@@ -216,7 +216,7 @@ def test_decryption7():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, halign='right')
+    url = crypto.generate(image_url=IMAGE_URL, halign='right', old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['halign'] == 'right'
@@ -238,7 +238,7 @@ def test_decryption8():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, valign='top')
+    url = crypto.generate(image_url=IMAGE_URL, valign='top', old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['valign'] == 'top'
@@ -264,7 +264,7 @@ def test_decryption9():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, crop=((10, 20), (30, 40)))
+    url = crypto.generate(image_url=IMAGE_URL, crop=((10, 20), (30, 40)), old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['crop']['left'] == 10
@@ -290,12 +290,29 @@ def test_decryption10():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, filters=["quality(20)", "brightness(10)"])
+    url = crypto.generate(image_url=IMAGE_URL, filters=["quality(20)", "brightness(10)"], old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert "quality(20)" in decrypted['filters']
     assert "brightness(10)" in decrypted['filters']
     assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
+
+
+class NewFormatUrl(TestCase):
+    def setUp(self):
+        self.crypto = CryptoURL(KEY)
+
+    def test_generated_url_1(self):
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200)
+        assert url == '/8ammJH8D-7tXy6kU3lTvoXlhu4o=/300x200/my.server.com/some/path/to/image.jpg'
+
+    def test_generated_url_2(self):
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)))
+        assert url == '/B35oBEIwztbc3jm7vsdqLez2C78=/10x10:200x200/300x200/my.server.com/some/path/to/image.jpg'
+
+    def test_generated_url_3(self):
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
+        assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
 
 
 class GenerateWithUnsafeTestCase(TestCase):

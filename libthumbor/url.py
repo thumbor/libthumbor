@@ -53,12 +53,14 @@ def url_for(**options):
 
 def unsafe_url(**options):
     '''Returns the unsafe url with the specified options'''
+
+    return 'unsafe/%s' % plain_image_url(**options)
+
+def plain_image_url(**options):
     url_parts = get_url_parts(**options)
     url_parts.append(options['image_url'])
-    url_parts.insert(0, 'unsafe')
 
     return '/'.join(url_parts)
-
 
 def get_url_parts(**options):
     if 'image_url' not in options:
