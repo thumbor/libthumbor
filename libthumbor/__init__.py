@@ -10,6 +10,6 @@
 
 '''libthumbor is the library used to access thumbor's images in python'''
 
-__version__ = "0.6.1"
+__version__ = "1.0.0"
 
 from libthumbor.crypto import CryptoURL
