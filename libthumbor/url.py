@@ -71,6 +71,15 @@ def get_url_parts(**options):
     if options.get('meta', False):
         url_parts.append('meta')
 
+    trim = options.get('trim', None)
+    if trim:
+        bits = ['trim']
+        if not isinstance(trim, bool):
+            bits.append(trim[0] if trim[0] else '')
+            if trim[1]:
+                bits.append(str(trim[1]))
+        url_parts.append(':'.join(bits))
+
     crop = options.get('crop', None)
     if crop:
         crop_left = crop[0][0]
