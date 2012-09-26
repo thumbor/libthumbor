@@ -423,6 +423,31 @@ def test_proper_meta():
 
     assert url == 'meta/84996242f65a4d864aceb125e1c4c5ba', url
 
+
+def test_trim_standard():
+    url = url_for(trim=True,
+                  image_url=IMAGE_URL)
+    assert url == 'trim/84996242f65a4d864aceb125e1c4c5ba', url
+
+
+def test_trim_pixel_and_tolerance():
+    url = url_for(trim=('bottom-right', 15),
+                  image_url=IMAGE_URL)
+    assert url == 'trim:bottom-right:15/84996242f65a4d864aceb125e1c4c5ba', url
+
+
+def test_trim_pixel_only():
+    url = url_for(trim=('top-left', None),
+                  image_url=IMAGE_URL)
+    assert url == 'trim:top-left/84996242f65a4d864aceb125e1c4c5ba', url
+
+
+def test_trim_tolerance_only():
+    url = url_for(trim=(None, 15),
+                  image_url=IMAGE_URL)
+    assert url == 'trim::15/84996242f65a4d864aceb125e1c4c5ba', url
+
+
 def test_manual_crop_1():
     '''test_manual_crop_1
     Given
