@@ -31,6 +31,7 @@ def test_usage():
         flip_vertical=False,
         halign='center',
         valign='middle',
+        trim=None,
         crop_left=0,
         crop_top=0,
         crop_right=0,
