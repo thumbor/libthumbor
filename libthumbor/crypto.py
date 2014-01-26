@@ -31,6 +31,8 @@ class CryptoURL(object):
         if not PYCRYPTOFOUND:
             raise RuntimeError('pyCrypto could not be found,' +
                                ' please install it before using libthumbor')
+        if isinstance(key, unicode):
+            key = str(key)
         self.key = key
         self.computed_key = (key * 16)[:16]
 

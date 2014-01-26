@@ -298,10 +298,7 @@ def test_decryption10():
     assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
 
 
-class NewFormatUrl(TestCase):
-    def setUp(self):
-        self.crypto = CryptoURL(KEY)
-
+class NewFormatUrlTestsMixin:
     def test_generated_url_1(self):
         url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200)
         assert url == '/8ammJH8D-7tXy6kU3lTvoXlhu4o=/300x200/my.server.com/some/path/to/image.jpg'
@@ -314,6 +311,13 @@ class NewFormatUrl(TestCase):
         url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
         assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
 
+class NewFormatUrl(TestCase, NewFormatUrlTestsMixin):
+    def setUp(self):
+        self.crypto = CryptoURL(KEY)
+
+class NewFormatUrlWithUnicodeKey(TestCase, NewFormatUrlTestsMixin):
+    def setUp(self):
+        self.crypto = CryptoURL(unicode(KEY))
 
 class GenerateWithUnsafeTestCase(TestCase):
 
