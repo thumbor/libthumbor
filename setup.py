@@ -13,6 +13,17 @@
 from setuptools import setup, find_packages
 from libthumbor import __version__
 
+tests_require = [
+    'mock',
+    'nose',
+    'coverage',
+    'yanc',
+    'preggy',
+    'ipdb',
+    'coveralls',
+    'thumbor',
+]
+
 setup(
     name = 'libthumbor',
     version = __version__,
@@ -41,6 +52,10 @@ It allows users to generate safe urls easily.
     package_dir = {"libthumbor": "libthumbor"},
     include_package_data = True,
     package_data = {
+    },
+
+    extras_require={
+        'tests': tests_require,
     },
 
     install_requires=[

@@ -6,3 +6,6 @@ ci_test:
 
 publish:
 	python setup.py sdist upload
+
+setup:
+	@pip install -U -e .\[tests\]
