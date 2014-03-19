@@ -1,0 +1,33 @@
+So you want to contribute with libthumbor? Welcome onboard!
+
+There are a few things you'll need in order to properly start hacking on it.
+
+First step is to fork it at http://help.github.com/fork-a-repo/ and create your own clone of libthumbor.
+
+## Dependencies
+
+We seriously advise you to use virtualenv (http://pypi.python.org/pypi/virtualenv) since it will keep your environment clean of libthumbor's dependencies and you can choose when to "turn them on".
+
+You'll also need python >= 2.6 and < 3.0.
+
+After that, just issue a `make setup` command and you'll be ready to start hacking.
+
+## Running the Tests
+
+Running the tests is as easy as:
+
+    make test
+
+## Pull Requests
+
+After hacking and testing your contribution, it is time to make a pull request. Make sure that your code is already integrated with the master branch of libthumbor before asking for a pull request.
+
+To add thumbor's remote as a valid remote for your repository:
+
+    git remote add libthumbor git://github.com/thumbor/libthumbor.git
+
+To merge thumbor's master with your fork:
+
+    git pull libthumbor master
+
+If there was anything to merge, just run your tests again. If they pass, send a pull request (http://help.github.com/send-pull-requests/).
