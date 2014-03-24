@@ -7,6 +7,8 @@ install:
     # update aptitude
     - sudo apt-get update -y
 
+    - sudo apt-get install -y aptitude
+
     # install aptitude packages
     - LDFLAGS=-lm sudo aptitude install -y $(< requirements)
 
@@ -15,6 +17,19 @@ install:
     - export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/dist-packages
     - export PYTHONPATH=$PYTHONPATH:/usr/lib/pyshared/python2.7/
     - export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages/
+
+    # verify both requirements were met
+    - INSTALLDIR=$(python -c "import os; import numpy; print(os.path.dirname(numpy.__file__))")
+
+    # Fix distribute
+    - wget http://python-distribute.org/distribute_setup.py
+    - python distribute_setup.py
+
+    # webp - compiling from source
+    - wget "https://webp.googlecode.com/files/libwebp-0.4.0.tar.gz" -O libwebp-0.4.0.tar.gz
+    - tar xvzf libwebp-0.4.0.tar.gz
+    - cd libwebp-0.4.0 && ./configure --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder && make && sudo make install; cd ..
+    - sudo ldconfig
 
     # install python requirements
     - pip install -r test_requirements.txt --use-mirrors
@@ -31,4 +46,3 @@ script:
 
     # finally run tests
     - make ci_test
-
