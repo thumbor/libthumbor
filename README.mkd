@@ -1,7 +1,7 @@
-[![Build Status](https://secure.travis-ci.org/heynemann/libthumbor.png)](http://travis-ci.org/heynemann/libthumbor)
+[![Build Status](https://secure.travis-ci.org/thumbor/libthumbor.png)](http://travis-ci.org/thumbor/libthumbor)
 
 libthumbor allows easy usage of
-[thumbor](http://github.com/globocom/thumbor) in Python. Check the docs for django integration.
+[thumbor](http://github.com/thumbor/thumbor) in Python. Check the docs for django integration.
 
 This version is compliant with the new URL generation schema (thumbor 3.0.0 and up).
 
