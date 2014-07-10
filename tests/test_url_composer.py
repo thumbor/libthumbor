@@ -9,6 +9,7 @@
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
 '''libthumbor URL composer tests'''
+import sys
 from unittest import TestCase
 
 from thumbor.crypto import Cryptor
@@ -227,6 +228,44 @@ def test_adaptive_fit_in_url():
                   image_url=IMAGE_URL)
 
     assert url == "adaptive-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba", url
+
+def test_fit_in_fails_if_no_width_supplied():
+    try:
+        url_for(fit_in=True, image_url=IMAGE_URL)
+    except ValueError:
+        err = sys.exc_info()[1]
+        assert err is not None
+    finally:
+        assert False, "Should not have gotten this far"
+
+def test_full_fit_in_fails_if_no_width_supplied():
+    try:
+        url_for(full_fit_in=True, image_url=IMAGE_URL)
+    except ValueError:
+        err = sys.exc_info()[1]
+        assert err is not None
+    finally:
+        assert False, "Should not have gotten this far"
+
+def test_adaptive_fit_in_fails_if_no_width_supplied():
+    try:
+        url_for(adaptive_fit_in=True, image_url=IMAGE_URL)
+    except ValueError:
+        err = sys.exc_info()[1]
+        assert err is not None
+    finally:
+        assert False, "Should not have gotten this far"
+
+def test_adaptive_full_fit_in_fails_if_no_width_supplied():
+    try:
+        url_for(adaptive_full_fit_in=True, image_url=IMAGE_URL)
+    except ValueError:
+        err = sys.exc_info()[1]
+        assert err is not None
+    finally:
+        assert False, "Should not have gotten this far"
+
+
 
 def test_full_fit_in_url():
     '''test_full_fit_in_url

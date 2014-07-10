@@ -95,17 +95,27 @@ def get_url_parts(**options):
                 crop_bottom
             ))
 
+    fit_in = False
+    full_fit_in = False
+
     if options.get('fit_in', None):
+        fit_in = True
         url_parts.append('fit-in')
 
     if options.get('full_fit_in', None):
+        full_fit_in = True
         url_parts.append('full-fit-in')
 
     if options.get('adaptive_fit_in', None):
+        fit_in = True
         url_parts.append('adaptive-fit-in')
 
     if options.get('adaptive_full_fit_in', None):
+        full_fit_in = True
         url_parts.append('adaptive-full-fit-in')
+
+    if (fit_in or full_fit_in) and not (options.get('width', None) or options.get('height', None)):
+        raise ValueError('When using fit-in or full-fit-in, you must specify width and/or height.')
 
     calculate_width_and_height(url_parts, options)
 
