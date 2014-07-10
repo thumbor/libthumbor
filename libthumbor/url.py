@@ -94,8 +94,18 @@ def get_url_parts(**options):
                 crop_right,
                 crop_bottom
             ))
+
     if options.get('fit_in', None):
         url_parts.append('fit-in')
+
+    if options.get('full_fit_in', None):
+        url_parts.append('full-fit-in')
+
+    if options.get('adaptive_fit_in', None):
+        url_parts.append('adaptive-fit-in')
+
+    if options.get('adaptive_full_fit_in', None):
+        url_parts.append('adaptive-full-fit-in')
 
     calculate_width_and_height(url_parts, options)
 

@@ -209,6 +209,64 @@ def test_fit_in_url():
 
     assert url == "fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba", url
 
+def test_adaptive_fit_in_url():
+    '''test_adaptive_fit_in_url
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a width of 200
+        And a height of 300
+        And the adaptive fit-in flag
+    When
+        I ask my library for an URL
+    Then
+        I get "adaptive-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width=200,
+                  height=300,
+                  adaptive_fit_in=True,
+                  image_url=IMAGE_URL)
+
+    assert url == "adaptive-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba", url
+
+def test_full_fit_in_url():
+    '''test_full_fit_in_url
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a width of 200
+        And a height of 300
+        And the full-fit-in flag
+    When
+        I ask my library for an URL
+    Then
+        I get "full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width=200,
+                  height=300,
+                  full_fit_in=True,
+                  image_url=IMAGE_URL)
+
+    assert url == "full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba", url
+
+def test_adaptive_full_fit_in_url():
+    '''test_adaptive_full_fit_in_url
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+        And a width of 200
+        And a height of 300
+        And the adaptive full-fit-in flag
+    When
+        I ask my library for an URL
+    Then
+        I get "adaptive-full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+    '''
+    url = url_for(width=200,
+                  height=300,
+                  adaptive_full_fit_in=True,
+                  image_url=IMAGE_URL)
+
+    assert url == "adaptive-full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba", url
+
+
 def test_flip_1():
     '''test_flip_1
     Given
