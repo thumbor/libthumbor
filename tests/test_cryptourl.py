@@ -128,7 +128,7 @@ def test_decryption_fit_in():
     '''
 
     crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, fit_in=True, old=True)
+    url = crypto.generate(image_url=IMAGE_URL, fit_in=True, width=300, height=200, old=True)
     decrypted = decrypt_in_thumbor(url)
 
     assert decrypted['fit_in'] == True

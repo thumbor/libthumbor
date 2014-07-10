@@ -235,7 +235,7 @@ def test_fit_in_fails_if_no_width_supplied():
     except ValueError:
         err = sys.exc_info()[1]
         assert err is not None
-    finally:
+    else:
         assert False, "Should not have gotten this far"
 
 def test_full_fit_in_fails_if_no_width_supplied():
@@ -244,7 +244,7 @@ def test_full_fit_in_fails_if_no_width_supplied():
     except ValueError:
         err = sys.exc_info()[1]
         assert err is not None
-    finally:
+    else:
         assert False, "Should not have gotten this far"
 
 def test_adaptive_fit_in_fails_if_no_width_supplied():
@@ -253,7 +253,7 @@ def test_adaptive_fit_in_fails_if_no_width_supplied():
     except ValueError:
         err = sys.exc_info()[1]
         assert err is not None
-    finally:
+    else:
         assert False, "Should not have gotten this far"
 
 def test_adaptive_full_fit_in_fails_if_no_width_supplied():
@@ -262,10 +262,8 @@ def test_adaptive_full_fit_in_fails_if_no_width_supplied():
     except ValueError:
         err = sys.exc_info()[1]
         assert err is not None
-    finally:
+    else:
         assert False, "Should not have gotten this far"
-
-
 
 def test_full_fit_in_url():
     '''test_full_fit_in_url
