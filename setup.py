@@ -4,7 +4,7 @@
 # libthumbor - python extension to thumbor
 # http://github.com/heynemann/libthumbor
 
-# Licensed under the MIT license: 
+# Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
@@ -31,7 +31,7 @@ setup(
     long_description = """
 libthumbor is the python extension to thumbor.
 It allows users to generate safe urls easily.
-""",    
+""",
     keywords = 'imaging face detection feature thumbor thumbnail' + \
                ' imagemagick pil opencv',
     author = 'Bernardo Heynemann',
@@ -59,7 +59,5 @@ It allows users to generate safe urls easily.
     },
 
     install_requires=[
-        "pyCrypto"
     ],
 )
-

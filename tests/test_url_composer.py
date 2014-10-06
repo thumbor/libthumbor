@@ -49,7 +49,7 @@ def test_url_raises_if_no_url():
     '''
     try:
         url_for()
-    except ValueError, err:
+    except ValueError as err:
         assert str(err) == 'The image_url argument is mandatory.'
         return True
     assert False, 'Should not have gotten this far'
@@ -487,7 +487,7 @@ def test_proper_haligns():
     '''test_proper_haligns'''
     try:
         url_for(halign='wrong', image_url=IMAGE_URL)
-    except ValueError, err:
+    except ValueError as err:
         assert str(err) == 'Only "left", "center" and "right"' + \
                            ' are valid values for horizontal alignment.'
         return True
@@ -497,7 +497,7 @@ def test_proper_valigns():
     '''test_proper_haligns'''
     try:
         url_for(valign='wrong', image_url=IMAGE_URL)
-    except ValueError, err:
+    except ValueError as err:
         assert str(err) == 'Only "top", "middle" and "bottom"' + \
                            ' are valid values for vertical alignment.'
         return True
