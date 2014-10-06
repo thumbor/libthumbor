@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 # libthumbor - python extension to thumbor
 # http://github.com/heynemann/libthumbor
@@ -10,6 +11,7 @@
 
 '''Encrypted URLs for thumbor encryption.'''
 
+import sys
 import base64
 import hmac
 import hashlib
@@ -22,21 +24,34 @@ except ImportError:
 
 from libthumbor.url import url_for, unsafe_url, plain_image_url
 
+if sys.version_info[0] >= 3:
+    PY3 = True
+    text = str
+    btext = bytes
+else:
+    PY3 = False
+    text = unicode
+    btext = str
+
 
 class CryptoURL(object):
     '''Class responsible for generating encrypted URLs for thumbor'''
 
     def __init__(self, key):
         '''Initializes the encryptor with the proper key'''
-        if not PYCRYPTOFOUND:
-            raise RuntimeError('pyCrypto could not be found,' +
-                               ' please install it before using libthumbor')
-        if isinstance(key, unicode):
-            key = str(key)
+        if isinstance(key, text):
+            if PY3:
+                key = btext(key, 'utf-8')
+            else:
+                key = btext(key)
         self.key = key
         self.computed_key = (key * 16)[:16]
 
     def generate_old(self, options):
+        if not PYCRYPTOFOUND:
+            raise RuntimeError('pyCrypto could not be found,' +
+                               ' please install it before using libthumbor')
+
         url = url_for(**options)
 
         pad = lambda s: s + (16 - len(s) % 16) * "{"
@@ -47,9 +62,9 @@ class CryptoURL(object):
 
     def generate_new(self, options):
         url = plain_image_url(**options)
-        signature = base64.urlsafe_b64encode(hmac.new(self.key, unicode(url).encode('utf-8'), hashlib.sha1).digest())
+        signature = base64.urlsafe_b64encode(hmac.new(self.key, url.encode('utf-8'), hashlib.sha1).digest())
 
-        return '/%s/%s' % (signature, url)
+        return '/%s/%s' % (signature.decode(), url)
 
     def generate(self, **options):
         '''Generates an encrypted URL with the specified options'''
@@ -61,4 +76,3 @@ class CryptoURL(object):
             if is_old:
                 return self.generate_old(options)
             return self.generate_new(options)
-

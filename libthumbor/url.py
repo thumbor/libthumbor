@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 # libthumbor - python extension to thumbor
 # http://github.com/heynemann/libthumbor

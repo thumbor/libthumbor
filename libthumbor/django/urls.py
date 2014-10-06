@@ -1,5 +1,8 @@
-from django.conf.urls.defaults import patterns, url
+from __future__ import unicode_literals
 
-urlpatterns = patterns('libthumbor.django.views',
-    url("^$", 'generate_url', name="generate_thumbor_url"),
-)
+from django.conf.urls.defaults import url
+from libthumbor.django.views import generate_url
+
+urlpatterns = [
+    url('^$', generate_url, name='thumbor_url'),
+]
