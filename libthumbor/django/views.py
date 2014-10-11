@@ -63,7 +63,7 @@ def generate_url(request):
         return HttpResponseBadRequest(error_message)
 
     try:
-        return HttpResponse(THUMBOR_SERVER + crypto.generate(**args).strip("/"), mimetype="text/plain")
+        return HttpResponse(THUMBOR_SERVER + crypto.generate(**args).strip("/"), content_type="text/plain")
     except (ValueError, KeyError), e:
         error_message = str(e)
         logging.warning(error_message)

@@ -16,6 +16,8 @@ import base64
 import hmac
 import hashlib
 
+from six import text_type, b
+
 try:
     from Crypto.Cipher import AES
     PYCRYPTOFOUND = True
@@ -33,7 +35,7 @@ class CryptoURL(object):
         if not PYCRYPTOFOUND:
             raise RuntimeError('pyCrypto could not be found,' +
                                ' please install it before using libthumbor')
-        if isinstance(key, unicode):
+        if isinstance(key, text_type):
             key = str(key)
         self.key = key
         self.computed_key = (key * 16)[:16]
@@ -49,9 +51,9 @@ class CryptoURL(object):
 
     def generate_new(self, options):
         url = plain_image_url(**options)
-        signature = base64.urlsafe_b64encode(hmac.new(self.key, unicode(url).encode('utf-8'), hashlib.sha1).digest())
+        signature = base64.urlsafe_b64encode(hmac.new(b(self.key), text_type(url).encode('utf-8'), hashlib.sha1).digest())
 
-        return '/%s/%s' % (signature, url)
+        return '/%s/%s' % (signature.decode('ascii'), url)
 
     def generate(self, **options):
         '''Generates an encrypted URL with the specified options'''
