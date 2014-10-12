@@ -15,6 +15,8 @@ from thumbor.crypto import Cryptor
 
 from libthumbor.crypto import CryptoURL
 
+from six import text_type
+
 IMAGE_URL = 'my.server.com/some/path/to/image.jpg'
 KEY = 'my-security-key'
 
@@ -317,7 +319,7 @@ class NewFormatUrl(TestCase, NewFormatUrlTestsMixin):
 
 class NewFormatUrlWithUnicodeKey(TestCase, NewFormatUrlTestsMixin):
     def setUp(self):
-        self.crypto = CryptoURL(unicode(KEY))
+        self.crypto = CryptoURL(text_type(KEY))
 
 class GenerateWithUnsafeTestCase(TestCase):
 

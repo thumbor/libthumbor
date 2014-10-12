@@ -13,6 +13,8 @@ import os
 
 from libthumbor.crypto import CryptoURL
 
+from six import b
+
 os.environ["DJANGO_SETTINGS_MODULE"] = 'testproj.settings'
 
 try:
@@ -54,7 +56,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_OK == response.status_code, "Got %d" % response.status_code
-            assert response.content == settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/")
+            assert response.content == b(settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/"))
 
         def test_passing_invalid_value_for_width(self):
             self.url_query.update({
@@ -65,7 +67,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
-            assert "The width value '1.2' is not an integer." == response.content
+            assert b("The width value '1.2' is not an integer.") == response.content
 
         def test_passing_invalid_value_for_height(self):
             self.url_query.update({
@@ -76,7 +78,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
-            assert "The height value 's' is not an integer." == response.content
+            assert b("The height value 's' is not an integer.") == response.content
 
         def test_passing_invalid_aligns(self):
             self.url_query.update({
@@ -97,7 +99,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
-            assert "Missing values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' values." == response.content
+            assert b("Missing values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' values.") == response.content
 
         def test_passing_only_one_crop_with_invalid_value(self):
             self.url_query.update({
@@ -111,7 +113,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
-            assert "Invalid values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' to be integers." == response.content
+            assert b("Invalid values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' to be integers.") == response.content
 
         def test_passing_various_erroneous_values(self):
             self.url_query.update({
@@ -151,4 +153,4 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_OK == response.status_code, "Got %d" % response.status_code
-            assert response.content == settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/")
+            assert response.content == b(settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/"))
