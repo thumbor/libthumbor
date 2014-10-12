@@ -11,12 +11,16 @@
 import re
 import hashlib
 
-from thumbor.crypto import Cryptor, Signer
-from thumbor.url import Url
+from six import b, PY3
+
+if PY3:
+    from thumbor_py3.crypto import Cryptor, Signer
+    from thumbor_py3.url import Url
+else:
+    from thumbor.crypto import Cryptor, Signer
+    from thumbor.url import Url
 
 from libthumbor import CryptoURL
-
-from six import b, PY3
 
 def test_usage():
     key = "my-security-key"

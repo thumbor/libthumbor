@@ -12,7 +12,12 @@
 import sys
 from unittest import TestCase
 
-from thumbor.crypto import Cryptor
+from six import PY3
+
+if PY3:
+    from thumbor_py3.crypto import Cryptor
+else:
+    from thumbor.crypto import Cryptor
 
 from libthumbor.url import url_for
 from libthumbor.url import unsafe_url

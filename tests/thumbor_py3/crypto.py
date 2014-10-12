@@ -14,7 +14,7 @@ import hmac
 
 from Crypto.Cipher import AES
 
-from thumbor.url import Url
+from .url import Url
 
 from six import text_type, PY3, b, PY2
 

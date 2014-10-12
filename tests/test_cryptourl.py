@@ -11,11 +11,14 @@
 '''libthumbor cryptography tests'''
 from unittest import TestCase
 
-from thumbor.crypto import Cryptor
+from six import text_type, PY3
+
+if PY3:
+    from thumbor_py3.crypto import Cryptor
+else:
+    from thumbor.crypto import Cryptor
 
 from libthumbor.crypto import CryptoURL
-
-from six import text_type
 
 IMAGE_URL = 'my.server.com/some/path/to/image.jpg'
 KEY = 'my-security-key'
