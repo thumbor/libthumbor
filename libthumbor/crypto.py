@@ -55,7 +55,9 @@ class CryptoURL(object):
         url = plain_image_url(**options)
         signature = base64.urlsafe_b64encode(hmac.new(b(self.key), text_type(url).encode('utf-8'), hashlib.sha1).digest())
 
-        return '/%s/%s' % (signature.decode('ascii'), url)
+        if PY3:
+            signature = signature.decode('ascii')
+        return '/%s/%s' % (signature, url)
 
     def generate(self, **options):
         '''Generates an encrypted URL with the specified options'''
