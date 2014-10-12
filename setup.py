@@ -59,7 +59,8 @@ It allows users to generate safe urls easily.
     },
 
     install_requires=[
-        "pyCrypto"
+        "pyCrypto",
+        "six"
     ],
 )
 
