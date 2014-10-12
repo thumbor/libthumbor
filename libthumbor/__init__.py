@@ -10,6 +10,8 @@
 
 '''libthumbor is the library used to access thumbor's images in python'''
 
-__version__ = "1.1.0"
+from pkg_resources import get_distribution
+
+__version__ = get_distribution('libthumbor').version
 
 from libthumbor.crypto import CryptoURL

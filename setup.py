@@ -11,7 +11,7 @@
 '''Module that configures setuptools to package libthumbor'''
 
 from setuptools import setup, find_packages
-from libthumbor import __version__
+import sys
 
 tests_require = [
     'mock',
@@ -21,12 +21,14 @@ tests_require = [
     'preggy',
     'ipdb',
     'coveralls',
-    'thumbor',
 ]
 
+if sys.version_info[0] == 2:
+    tests_require.append('thumbor')
+    
 setup(
     name = 'libthumbor',
-    version = __version__,
+    version = "1.1.0",
     description = "libthumbor is the python extension to thumbor",
     long_description = """
 libthumbor is the python extension to thumbor.
