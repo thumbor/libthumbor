@@ -26,6 +26,7 @@ def test_usage():
         height=200,
         smart=True,
         adaptive=False,
+        full=False,
         fit_in=False,
         flip_horizontal=False,
         flip_vertical=False,
