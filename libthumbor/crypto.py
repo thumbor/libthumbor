@@ -15,6 +15,15 @@ from __future__ import absolute_import
 import base64
 import hmac
 import hashlib
+import sys
+
+PY3 = sys.version_info[0] == 3
+
+if PY3:
+    str_or_unicode = str
+else:
+    str_or_unicode = unicode
+
 
 try:
     from Crypto.Cipher import AES
@@ -33,7 +42,7 @@ class CryptoURL(object):
         if not PYCRYPTOFOUND:
             raise RuntimeError('pyCrypto could not be found,' +
                                ' please install it before using libthumbor')
-        if isinstance(key, unicode):
+        if isinstance(key, str_or_unicode):
             key = str(key)
         self.key = key
         self.computed_key = (key * 16)[:16]
@@ -49,7 +58,7 @@ class CryptoURL(object):
 
     def generate_new(self, options):
         url = plain_image_url(**options)
-        signature = base64.urlsafe_b64encode(hmac.new(self.key, unicode(url).encode('utf-8'), hashlib.sha1).digest())
+        signature = base64.urlsafe_b64encode(hmac.new(self.key, str_or_unicode(url).encode('utf-8'), hashlib.sha1).digest())
 
         return '/%s/%s' % (signature, url)
 
