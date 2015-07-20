@@ -11,8 +11,14 @@
 import re
 import hashlib
 
-from thumbor.crypto import Cryptor, Signer
-from thumbor.url import Url
+from six import b, PY3
+
+if PY3:
+    from thumbor_py3.crypto import Cryptor, Signer
+    from thumbor_py3.url import Url
+else:
+    from thumbor.crypto import Cryptor, Signer
+    from thumbor.url import Url
 
 from libthumbor import CryptoURL
 
@@ -40,6 +46,9 @@ def test_usage():
         filters=[],
         image=image
     )
+
+    if PY3:
+        thumbor_options = thumbor_options.decode('ascii')
     thumbor_url = "/%s/%s" % (thumbor_options, image)
 
     crypto = CryptoURL(key=key)
@@ -76,7 +85,10 @@ def test_usage_new_format():
         filters=[]
     )
     thumbor_url = ('%s/%s' % (thumbor_url, image)).lstrip('/')
-    thumbor_url = '/%s/%s' % (thumbor_signer.signature(thumbor_url), thumbor_url)
+    signature = thumbor_signer.signature(thumbor_url)
+    if PY3:
+        signature = signature.decode('ascii')
+    thumbor_url = '/%s/%s' % (signature, thumbor_url)
 
     crypto = CryptoURL(key=key)
     url = crypto.generate(
@@ -112,7 +124,7 @@ def test_thumbor_can_decrypt_lib_thumbor_generated_url():
     assert decrypted_url['height'] == 200
     assert decrypted_url['width'] == 300
     assert decrypted_url['smart']
-    assert decrypted_url['image_hash'] == hashlib.md5(image).hexdigest()
+    assert decrypted_url['image_hash'] == hashlib.md5(b(image)).hexdigest()
 
 def test_thumbor_can_decrypt_lib_thumbor_generated_url_new_format():
     key = "my-security-key"
@@ -131,4 +143,4 @@ def test_thumbor_can_decrypt_lib_thumbor_generated_url_new_format():
     reg = "/([^/]+)/(.+)"
     (signature, url) = re.match(reg, url).groups()
 
-    assert thumbor_signer.validate(signature, url)
+    assert thumbor_signer.validate(b(signature), url)
