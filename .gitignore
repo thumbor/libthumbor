@@ -4,3 +4,4 @@
 dist
 libthumbor.egg-info
 *.db
+.coverage

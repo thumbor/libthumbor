@@ -18,42 +18,40 @@ tests_require = [
     'nose',
     'coverage',
     'yanc',
-    'preggy',
-    'ipdb',
-    'coveralls',
+    'preggy'
 ]
 
 if sys.version_info[0] == 2:
     tests_require.append('thumbor')
 
 setup(
-    name = 'libthumbor',
-    version = "1.2.0",
-    description = "libthumbor is the python extension to thumbor",
-    long_description = """
+    name='libthumbor',
+    version="1.2.0",
+    description="libthumbor is the python extension to thumbor",
+    long_description="""
 libthumbor is the python extension to thumbor.
 It allows users to generate safe urls easily.
 """,
-    keywords = 'imaging face detection feature thumbor thumbnail' + \
-               ' imagemagick pil opencv',
-    author = 'Bernardo Heynemann',
-    author_email = 'heynemann@gmail.com',
-    url = 'http://github.com/heynemann/libthumbor',
-    license = 'MIT',
-    classifiers = ['Development Status :: 4 - Beta',
-                   'Intended Audience :: Developers',
-                   'License :: OSI Approved :: MIT License',
-                   'Natural Language :: English',
-                   'Operating System :: MacOS',
-                   'Operating System :: POSIX :: Linux',
-                   'Programming Language :: Python :: 2.6',
-                   'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-                   'Topic :: Multimedia :: Graphics :: Presentation'
-    ],
-    packages = find_packages(),
-    package_dir = {"libthumbor": "libthumbor"},
-    include_package_data = True,
-    package_data = {
+    keywords='imaging face detection feature thumbor thumbnail' +
+             ' imagemagick pil opencv',
+    author='Bernardo Heynemann',
+    author_email='heynemann@gmail.com',
+    url='http://github.com/heynemann/libthumbor',
+    license='MIT',
+    classifiers=['Development Status :: 4 - Beta',
+                 'Intended Audience :: Developers',
+                 'License :: OSI Approved :: MIT License',
+                 'Natural Language :: English',
+                 'Operating System :: MacOS',
+                 'Operating System :: POSIX :: Linux',
+                 'Programming Language :: Python :: 2.6',
+                 'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+                 'Topic :: Multimedia :: Graphics :: Presentation'
+                 ],
+    packages=find_packages(),
+    package_dir={"libthumbor": "libthumbor"},
+    include_package_data=True,
+    package_data={
     },
 
     extras_require={
@@ -65,4 +63,3 @@ It allows users to generate safe urls easily.
         "six"
     ],
 )
-

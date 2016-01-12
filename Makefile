@@ -1,8 +1,9 @@
-test:
-	nosetests -v -s tests
+test ci_test:
+	@coverage run --branch `which nosetests` -v --with-yanc -s tests/
+	@$(MAKE) coverage
 
-ci_test:
-	nosetests -v -s tests
+coverage:
+	@coverage report -m --fail-under=76
 
 publish:
 	python setup.py sdist upload
