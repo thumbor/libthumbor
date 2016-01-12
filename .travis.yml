@@ -1,19 +1,43 @@
 language: python
 python:
-  - "2.7"
+  - '2.7'
+  - '3.2'
+  - '3.3'
+  - '3.4'
+  - '3.5'
+  - pypy
+cache:
+  directories:
+    - $HOME/.cache/pip
+sudo: false
+matrix:
+  fast_finish: true
 
+addons:
+  apt:
+    packages:
+    - libcurl4-openssl-dev
+    - python-numpy
+    - python-opencv
+    - libopencv-dev
+    - libjpeg-dev
+    - libpng-dev
+    - libx264-dev
+    - libass-dev
+    - libvpx1
+    - libvpx-dev
+    - libwebp-dev
+    - webp
+    - gifsicle
+    - python-numpy
+    - python-scipy
+    - cython
 install:
-    # update aptitude
-    - sudo apt-get update -y
+  - make setup
+  - pip install coveralls
 
-    - sudo apt-get install -y aptitude
+script: make ci_test
 
-    # install aptitude packages
-    - LDFLAGS=-lm sudo aptitude install -y $(< requirements)
+after_success:
+  coveralls
 
-    # install python requirements
-    - make setup
-
-script:
-    # finally run tests
-    - make ci_test
