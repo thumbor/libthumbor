@@ -30,8 +30,14 @@ from libthumbor.url import url_for, unsafe_url, plain_image_url
 class CryptoURL(object):
     '''Class responsible for generating encrypted URLs for thumbor'''
 
-    def __init__(self, key):
-        '''Initializes the encryptor with the proper key'''
+    def __init__(self, key, thread_safe=True):
+        '''
+        Initializes the encryptor with the proper key
+        :param key: secret key to use for hashing.
+        :param thread_safe: if True (default) CryptoURL will not reuse the hmac instance on every generate call,
+         instead a copy of the hmac object will be created. Consider setting this parameter to False when only one
+         thread has access to the CryptoURL object at a time.
+        '''
         if not PYCRYPTOFOUND:
             raise RuntimeError('pyCrypto could not be found,' +
                                ' please install it before using libthumbor')
@@ -39,6 +45,8 @@ class CryptoURL(object):
             key = str(key)
         self.key = key
         self.computed_key = (key * 16)[:16]
+        self.hmac = hmac.new(b(key), digestmod=hashlib.sha1)
+        self.thread_safe = thread_safe
 
     def generate_old(self, options):
         url = url_for(**options)
@@ -53,7 +61,9 @@ class CryptoURL(object):
 
     def generate_new(self, options):
         url = plain_image_url(**options)
-        signature = base64.urlsafe_b64encode(hmac.new(b(self.key), text_type(url).encode('utf-8'), hashlib.sha1).digest())
+        _hmac = self.hmac.copy() if self.thread_safe else self.hmac
+        _hmac.update(text_type(url).encode('utf-8'))
+        signature = base64.urlsafe_b64encode(_hmac.digest())
 
         if PY3:
             signature = signature.decode('ascii')
