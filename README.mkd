@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/thumbor/libthumbor.png)](http://travis-ci.org/thumbor/libthumbor)
+[![Build Status](https://secure.travis-ci.org/thumbor/libthumbor.png)](http://travis-ci.org/thumbor/libthumbor) [![Coverage Status](https://coveralls.io/repos/thumbor/libthumbor/badge.svg?branch=master&service=github)](https://coveralls.io/github/thumbor/libthumbor?branch=master)
 
 libthumbor allows easy usage of
 [thumbor](http://github.com/thumbor/thumbor) in Python. Check the docs for django integration.
