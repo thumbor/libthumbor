@@ -45,7 +45,7 @@ class CryptoURL(object):
             key = str(key)
         self.key = key
         self.computed_key = (key * 16)[:16]
-        self.hmac = hmac.new(key, digestmod=hashlib.sha1)
+        self.hmac = hmac.new(b(key), digestmod=hashlib.sha1)
         self.thread_safe = thread_safe
 
     def generate_old(self, options):
@@ -62,7 +62,7 @@ class CryptoURL(object):
     def generate_new(self, options):
         url = plain_image_url(**options)
         _hmac = self.hmac.copy() if self.thread_safe else self.hmac
-        _hmac.update(url)
+        _hmac.update(text_type(url).encode('utf-8'))
         signature = base64.urlsafe_b64encode(_hmac.digest())
 
         if PY3:
