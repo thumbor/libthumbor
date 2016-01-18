@@ -30,7 +30,7 @@ from libthumbor.url import url_for, unsafe_url, plain_image_url
 class CryptoURL(object):
     '''Class responsible for generating encrypted URLs for thumbor'''
 
-    def __init__(self, key, thread_safe=True):
+    def __init__(self, key):
         '''
         Initializes the encryptor with the proper key
         :param key: secret key to use for hashing.
@@ -46,7 +46,6 @@ class CryptoURL(object):
         self.key = key
         self.computed_key = (key * 16)[:16]
         self.hmac = hmac.new(b(key), digestmod=hashlib.sha1)
-        self.thread_safe = thread_safe
 
     def generate_old(self, options):
         url = url_for(**options)
@@ -61,7 +60,7 @@ class CryptoURL(object):
 
     def generate_new(self, options):
         url = plain_image_url(**options)
-        _hmac = self.hmac.copy() if self.thread_safe else self.hmac
+        _hmac = self.hmac.copy()
         _hmac.update(text_type(url).encode('utf-8'))
         signature = base64.urlsafe_b64encode(_hmac.digest())
 
