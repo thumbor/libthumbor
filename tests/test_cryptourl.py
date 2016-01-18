@@ -11,296 +11,12 @@
 '''libthumbor cryptography tests'''
 from unittest import TestCase
 
-from six import text_type, PY3
-
-if PY3:
-    from thumbor_py3.crypto import Cryptor
-else:
-    from thumbor.crypto import Cryptor
+from six import text_type
 
 from libthumbor.crypto import CryptoURL
 
 IMAGE_URL = 'my.server.com/some/path/to/image.jpg'
 KEY = 'my-security-key'
-
-def decrypt_in_thumbor(url):
-    '''Uses thumbor to decrypt libthumbor's encrypted URL'''
-    encrypted = url.split('/')[1]
-    cryptor = Cryptor(KEY)
-    return cryptor.decrypt(encrypted)
-
-def test_decryption1():
-    '''test_decryption1
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And a width of 300
-        And a height of 200
-    When
-        I ask my library for an encrypted URL
-    Then
-        I get
-        '/l42l54VqaV_J-EcB5quNMP6CnsN9BX7htrh-QbPuDv0C7adUXX7LTo6DHm_woJtZ/my.server.com/some/path/to/image.jpg'
-        as url
-    '''
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, width=300, height=200, old=True)
-
-    assert url == '/l42l54VqaV_J-EcB5quNMP6CnsN9BX7htrh-QbPuDv0C7adUXX7' + \
-                  'LTo6DHm_woJtZ/my.server.com/some/path/to/image.jpg'
-
-def test_decription2():
-    '''test_decription2
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And a width of 300
-        And a height of 200
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            horizontal_flip = False
-            vertical_flip = False
-            smart = False
-            fit_in = False
-            meta = False
-            crop['left'] = 0
-            crop['top'] = 0
-            crop['right'] = 0
-            crop['bottom'] = 0
-            valign = "middle"
-            halign = "center"
-            width = 300
-            height = 200
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, width=300, height=200, old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['horizontal_flip'] == False
-    assert decrypted['vertical_flip'] == False
-    assert decrypted['smart'] == False
-    assert decrypted['fit_in'] == False
-    assert decrypted['meta'] == False
-    assert decrypted['crop']['left'] == 0
-    assert decrypted['crop']['top'] == 0
-    assert decrypted['crop']['right'] == 0
-    assert decrypted['crop']['bottom'] == 0
-    assert decrypted['valign'] == "middle"
-    assert decrypted['halign'] == "center"
-    assert decrypted['width'] == 300
-    assert decrypted['height'] == 200
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption3():
-    '''test_decryption3
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And the meta flag
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            meta = True
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, meta=True, old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['meta'] == True
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption_fit_in():
-    '''test_decryption_fit_in
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And the fit-in flag
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            fit-in = True
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, fit_in=True, width=300, height=200, old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['fit_in'] == True
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption4():
-    '''test_decryption4
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And the smart flag
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            smart = True
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, smart=True, old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['smart'] == True
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption5():
-    '''test_decryption5
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And the flip flag
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            flip_horizontally = True
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, flip=True, old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['horizontal_flip'] == True
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption6():
-    '''test_decryption6
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And the flop flag
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            flip_vertically = True
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, flop=True, old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['vertical_flip'] == True
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption7():
-    '''test_decryption7
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And the horizontal alignment of 'right'
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            halign = 'right'
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, halign='right', old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['halign'] == 'right'
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption8():
-    '''test_decryption8
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And the vertical alignment of 'top'
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            valign = 'top'
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, valign='top', old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['valign'] == 'top'
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption9():
-    '''test_decryption9
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And a manual crop left-top point of (10, 20)
-        And a manual crop right-bottom point of (30, 40)
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            crop['left'] = 10
-            crop['top'] = 20
-            crop['right'] = 30
-            crop['bottom'] = 40
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, crop=((10, 20), (30, 40)), old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert decrypted['crop']['left'] == 10
-    assert decrypted['crop']['top'] == 20
-    assert decrypted['crop']['right'] == 30
-    assert decrypted['crop']['bottom'] == 40
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
-
-def test_decryption10():
-    '''test_decryption10
-    Given
-        A security key of 'my-security-key'
-        And an image URL of "my.server.com/some/path/to/image.jpg"
-        And a quality filter with 20% quality
-        And a brightness filter with 10% improvement
-    When
-        I ask my library for an encrypted URL
-        And I call the aforementioned 'decrypt_in_thumbor' method
-    Then
-        I get a decrypted dictionary that contains the following:
-            filters = ["quality(20)", "brightness(10)"]
-            image_hash = 84996242f65a4d864aceb125e1c4c5ba
-    '''
-
-    crypto = CryptoURL(KEY)
-    url = crypto.generate(image_url=IMAGE_URL, filters=["quality(20)", "brightness(10)"], old=True)
-    decrypted = decrypt_in_thumbor(url)
-
-    assert "quality(20)" in decrypted['filters']
-    assert "brightness(10)" in decrypted['filters']
-    assert decrypted['image_hash'] == '84996242f65a4d864aceb125e1c4c5ba'
 
 
 class NewFormatUrlTestsMixin:
@@ -309,18 +25,18 @@ class NewFormatUrlTestsMixin:
         assert url == '/8ammJH8D-7tXy6kU3lTvoXlhu4o=/300x200/my.server.com/some/path/to/image.jpg'
 
     def test_generated_url_2(self):
-        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)))
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10, 10), (200, 200)))
         assert url == '/B35oBEIwztbc3jm7vsdqLez2C78=/10x10:200x200/300x200/my.server.com/some/path/to/image.jpg'
 
     def test_generated_url_3(self):
-        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10, 10), (200, 200)), filters=("brightness(20)", "contrast(10)"))
         assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
 
     def test_generated_url_4(self):
-        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10, 10), (200, 200)), filters=("brightness(20)", "contrast(10)"))
         assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
         # making sure no internal state affects subsequent calls.
-        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10, 10), (200, 200)), filters=("brightness(20)", "contrast(10)"))
         assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
 
 
@@ -328,9 +44,11 @@ class NewFormatUrl(TestCase, NewFormatUrlTestsMixin):
     def setUp(self):
         self.crypto = CryptoURL(KEY)
 
+
 class NewFormatUrlWithUnicodeKey(TestCase, NewFormatUrlTestsMixin):
     def setUp(self):
         self.crypto = CryptoURL(text_type(KEY))
+
 
 class GenerateWithUnsafeTestCase(TestCase):
 

@@ -3,6 +3,7 @@ try:
 except ImportError:
     from django.conf.urls import patterns, url
 
-urlpatterns = patterns('libthumbor.django.views',
+urlpatterns = patterns(
+    'libthumbor.django.views',
     url("^$", 'generate_url', name="generate_thumbor_url"),
 )

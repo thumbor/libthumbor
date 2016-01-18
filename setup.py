@@ -18,7 +18,8 @@ tests_require = [
     'nose',
     'coverage',
     'yanc',
-    'preggy'
+    'preggy',
+    'flake8',
 ]
 
 if sys.version_info[0] == 2:
@@ -59,7 +60,6 @@ It allows users to generate safe urls easily.
     },
 
     install_requires=[
-        "pyCrypto",
         "six"
     ],
 )

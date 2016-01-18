@@ -43,7 +43,7 @@ if DJANGO_PRESENT:
 
         def test_generate_url_with_params_via_post(self):
             image_args = {'image_url': 'globo.com/media/img/my_image.jpg'}
-            
+
             response = self.client.post('/gen_url/', image_args)
 
             assert HTTP_METHOD_NOT_ALLOWED == response.status_code, "Got %d" % response.status_code
@@ -52,7 +52,7 @@ if DJANGO_PRESENT:
             crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
             image_args = {'image_url': 'globo.com/media/img/my_image.jpg'}
             self.url_query.update(image_args)
-            
+
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_OK == response.status_code, "Got %d" % response.status_code
@@ -113,7 +113,10 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
-            assert b("Invalid values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' to be integers.") == response.content
+            assert b(
+                '''Invalid values for cropping.
+                    Expected all 'crop_left', 'crop_top', 'crop_right',
+                    'crop_bottom' to be integers.''') == response.content
 
         def test_passing_various_erroneous_values(self):
             self.url_query.update({
@@ -146,7 +149,7 @@ if DJANGO_PRESENT:
                 'crop_bottom': 200,
                 'crop_right': 200
             })
-            image_args.update({'crop': ((100,100), (200,200)) })
+            image_args.update({'crop': ((100, 100), (200, 200))})
 
             crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
 

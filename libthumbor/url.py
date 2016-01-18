@@ -58,11 +58,13 @@ def unsafe_url(**options):
 
     return 'unsafe/%s' % plain_image_url(**options)
 
+
 def plain_image_url(**options):
     url_parts = get_url_parts(**options)
     url_parts.append(options['image_url'])
 
     return '/'.join(url_parts)
+
 
 def get_url_parts(**options):
     if 'image_url' not in options:
@@ -124,10 +126,10 @@ def get_url_parts(**options):
     halign = options.get('halign', 'center')
     valign = options.get('valign', 'middle')
 
-    if not halign in AVAILABLE_HALIGN:
+    if halign not in AVAILABLE_HALIGN:
         raise ValueError('Only "left", "center" and "right" are' +
                          ' valid values for horizontal alignment.')
-    if not valign in AVAILABLE_VALIGN:
+    if valign not in AVAILABLE_VALIGN:
         raise ValueError('Only "top", "middle" and "bottom" are' +
                          ' valid values for vertical alignment.')
 

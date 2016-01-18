@@ -18,13 +18,7 @@ import hashlib
 
 from six import text_type, b, PY3
 
-try:
-    from Crypto.Cipher import AES
-    PYCRYPTOFOUND = True
-except ImportError:
-    PYCRYPTOFOUND = False
-
-from libthumbor.url import url_for, unsafe_url, plain_image_url
+from libthumbor.url import unsafe_url, plain_image_url
 
 
 class CryptoURL(object):
@@ -38,25 +32,12 @@ class CryptoURL(object):
          instead a copy of the hmac object will be created. Consider setting this parameter to False when only one
          thread has access to the CryptoURL object at a time.
         '''
-        if not PYCRYPTOFOUND:
-            raise RuntimeError('pyCrypto could not be found,' +
-                               ' please install it before using libthumbor')
+
         if isinstance(key, text_type):
             key = str(key)
         self.key = key
         self.computed_key = (key * 16)[:16]
         self.hmac = hmac.new(b(key), digestmod=hashlib.sha1)
-
-    def generate_old(self, options):
-        url = url_for(**options)
-
-        pad = lambda s: s + (16 - len(s) % 16) * "{"
-        cypher = AES.new(self.computed_key)
-        encrypted = base64.urlsafe_b64encode(cypher.encrypt(pad(url)))
-
-        if PY3:
-            encrypted = encrypted.decode('ascii')
-        return "/%s/%s" % (encrypted, options['image_url'])
 
     def generate_new(self, options):
         url = plain_image_url(**options)
@@ -74,8 +55,4 @@ class CryptoURL(object):
         if options.get('unsafe', False):
             return unsafe_url(**options)
         else:
-            is_old = options.get('old', False)
-            if is_old:
-                return self.generate_old(options)
             return self.generate_new(options)
-
