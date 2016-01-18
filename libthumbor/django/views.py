@@ -51,12 +51,22 @@ def generate_url(request):
 
     try:
         if 'crop_top' in args or 'crop_left' in args or 'crop_right' in args or 'crop_bottom' in args:
-            args['crop'] = ((int(args['crop_left']), int(args['crop_top'])),
-                    (int(args['crop_right']), int(args['crop_bottom'])))
+            args['crop'] = (
+                (int(args['crop_left']), int(args['crop_top'])),
+                (int(args['crop_right']), int(args['crop_bottom']))
+            )
     except KeyError as e:
-        error_message = "Missing values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' values."
+        error_message = '''
+            Missing values for cropping.
+            Expected all 'crop_left', 'crop_top',
+            'crop_right', 'crop_bottom' values.
+        '''
     except ValueError as e:
-        error_message = "Invalid values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' to be integers."
+        error_message = '''
+            Invalid values for cropping.
+            Expected all 'crop_left', 'crop_top',
+            'crop_right', 'crop_bottom' to be integers.
+        '''
 
     if error_message is not None:
         logging.warning(error_message)

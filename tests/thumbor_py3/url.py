@@ -63,7 +63,9 @@ class Url(object):
 
         result = result.groupdict()
 
-        int_or_0 = lambda value: 0 if value is None else int(value)
+        def int_or_0(value):
+            return 0 if value is None else int(value)
+
         values = {
             'debug': result['debug'] == 'debug',
             'meta': result['meta'] == 'meta',
@@ -140,7 +142,7 @@ class Url(object):
                 fit_ops.append('adaptive')
             if full:
                 fit_ops.append('full')
-            fit_ops.append('fit-in');
+            fit_ops.append('fit-in')
             url.append('-'.join(fit_ops))
 
         if horizontal_flip:
@@ -165,5 +167,5 @@ class Url(object):
         return '/'.join(url)
 
     @classmethod
-    def encode_url(kls, url):
+    def encode_url(cls, url):
         return quote(url, '/:?%=&()~",\'')

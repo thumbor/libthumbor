@@ -19,5 +19,5 @@ try:
 except DistributionNotFound:
     # Returns a local version. For tests.
     __version__ = '{}-local'.format(__project__)
-    
-from libthumbor.crypto import CryptoURL
+
+from libthumbor.crypto import CryptoURL  # NOQA
