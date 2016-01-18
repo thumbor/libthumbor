@@ -316,6 +316,14 @@ class NewFormatUrlTestsMixin:
         url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
         assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
 
+    def test_generated_url_4(self):
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
+        assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
+        # making sure no internal state affects subsequent calls.
+        url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200, crop=((10,10), (200,200)), filters=("brightness(20)", "contrast(10)"))
+        assert url == '/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg'
+
+
 class NewFormatUrl(TestCase, NewFormatUrlTestsMixin):
     def setUp(self):
         self.crypto = CryptoURL(KEY)
