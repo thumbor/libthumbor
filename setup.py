@@ -11,7 +11,6 @@
 '''Module that configures setuptools to package libthumbor'''
 
 from setuptools import setup, find_packages
-import sys
 
 tests_require = [
     'mock',
@@ -21,9 +20,6 @@ tests_require = [
     'preggy',
     'flake8',
 ]
-
-if sys.version_info[0] == 2:
-    tests_require.append('thumbor')
 
 setup(
     name='libthumbor',
