@@ -23,7 +23,7 @@ tests_require = [
 
 setup(
     name='libthumbor',
-    version="1.3.1",
+    version="1.3.2",
     description="libthumbor is the python extension to thumbor",
     long_description="""
 libthumbor is the python extension to thumbor.
