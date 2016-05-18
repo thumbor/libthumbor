@@ -12,14 +12,7 @@ import re
 
 from six import b, PY3
 
-from libthumbor import CryptoURL
-
-if PY3:
-    from thumbor_py3.crypto import Signer
-    from thumbor_py3.url import Url
-else:
-    from thumbor.crypto import Signer
-    from thumbor.url import Url
+from libthumbor import CryptoURL, Url, Signer
 
 
 def test_usage_new_format():
