@@ -13,7 +13,6 @@
 from setuptools import setup, find_packages
 
 tests_require = [
-    'mock',
     'nose',
     'coverage',
     'yanc',
