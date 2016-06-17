@@ -99,7 +99,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
-            assert b("Missing values for cropping. Expected all 'crop_left', 'crop_top', 'crop_right', 'crop_bottom' values.") == response.content
+            assert "Missing values for cropping" in response.content
 
         def test_passing_only_one_crop_with_invalid_value(self):
             self.url_query.update({
@@ -113,10 +113,7 @@ if DJANGO_PRESENT:
             response = self.client.get('/gen_url/?' + self.url_query.urlencode())
 
             assert HTTP_BAD_REQUEST == response.status_code, "Got %d" % response.status_code
-            assert b(
-                '''Invalid values for cropping.
-                    Expected all 'crop_left', 'crop_top', 'crop_right',
-                    'crop_bottom' to be integers.''') == response.content
+            assert "Invalid values for cropping" in response.content
 
         def test_passing_various_erroneous_values(self):
             self.url_query.update({
