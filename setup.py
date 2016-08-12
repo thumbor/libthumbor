@@ -44,7 +44,7 @@ It allows users to generate safe urls easily.
                  'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                  'Topic :: Multimedia :: Graphics :: Presentation'
                  ],
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests', 'tests.*']),
     package_dir={"libthumbor": "libthumbor"},
     include_package_data=True,
     package_data={
