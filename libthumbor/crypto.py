@@ -42,7 +42,7 @@ class CryptoURL(object):
     def generate_new(self, options):
         url = plain_image_url(**options)
         _hmac = self.hmac.copy()
-        _hmac.update(text_type(url).encode('utf-8'))
+        _hmac.update(text_type(url.split('?')[0]).encode('utf-8'))
         signature = base64.urlsafe_b64encode(_hmac.digest())
 
         if PY3:
