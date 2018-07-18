@@ -13,6 +13,7 @@
 from setuptools import setup, find_packages
 
 tests_require = [
+    'setuptools',
     'nose',
     'coverage',
     'yanc',
