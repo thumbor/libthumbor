@@ -41,6 +41,7 @@ It allows users to generate safe urls easily.
                  'Operating System :: MacOS',
                  'Operating System :: POSIX :: Linux',
                  'Programming Language :: Python :: 2.6',
+                 'Programming Language :: Python :: 3',
                  'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
                  'Topic :: Multimedia :: Graphics :: Presentation'
                  ],
