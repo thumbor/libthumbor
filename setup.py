@@ -56,6 +56,6 @@ It allows users to generate safe urls easily.
     },
 
     install_requires=[
-        "six>=0.11"
+        "six==1.10.0"
     ],
 )
