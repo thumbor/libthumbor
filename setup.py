@@ -10,6 +10,8 @@
 
 '''Module that configures setuptools to package libthumbor'''
 
+import ast
+import os.path
 from setuptools import setup, find_packages
 
 tests_require = [
@@ -20,9 +22,21 @@ tests_require = [
     'flake8',
 ]
 
+
+class GetVersion(ast.NodeVisitor):
+    def __init__(self, path):
+        with open(path) as f:
+            self.visit(ast.parse(f.read(), path))
+
+    def visit_Assign(self, node):
+        if any(target.id == '__version__' for target in node.targets):
+            assert not hasattr(self, '__version__')
+            self.__version__ = node.value.s
+
+
 setup(
     name='libthumbor',
-    version="1.3.2",
+    version=GetVersion(os.path.join(os.path.dirname(__file__), 'libthumbor', '__init__.py')).__version__,
     description="libthumbor is the python extension to thumbor",
     long_description="""
 libthumbor is the python extension to thumbor.

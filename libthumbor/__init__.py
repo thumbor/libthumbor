@@ -10,15 +10,8 @@
 
 '''libthumbor is the library used to access thumbor's images in python'''
 
-from pkg_resources import get_distribution, DistributionNotFound
-
 __project__ = 'libthumbor'
-
-try:
-    __version__ = get_distribution(__project__).version
-except DistributionNotFound:
-    # Returns a local version. For tests.
-    __version__ = '{}-local'.format(__project__)
+__version__ = '1.3.2'
 
 from libthumbor.crypto import CryptoURL  # NOQA
 from libthumbor.url import Url  # NOQA
