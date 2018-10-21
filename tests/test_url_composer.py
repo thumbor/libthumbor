@@ -625,6 +625,13 @@ def test_smart_after_alignments():
     assert url == 'left/smart/84996242f65a4d864aceb125e1c4c5ba', url
 
 
+def test_stretch():
+    url = url_for(stretch=True,
+                  image_url=IMAGE_URL)
+
+    assert url == 'stretch/84996242f65a4d864aceb125e1c4c5ba', url
+
+
 class UnsafeUrlTestCase(TestCase):
 
     def test_should_return_a_valid_unsafe_url_with_no_params(self):
