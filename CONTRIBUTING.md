@@ -1,3 +1,5 @@
+# CONTRIBUTING
+
 So you want to contribute with libthumbor? Welcome onboard!
 
 There are a few things you'll need in order to properly start hacking on it.
@@ -16,7 +18,9 @@ After that, just issue a `make setup` command and you'll be ready to start hacki
 
 Running the tests is as easy as:
 
-    make test
+~~~bash
+make test
+~~~
 
 ## Pull Requests
 
@@ -24,10 +28,14 @@ After hacking and testing your contribution, it is time to make a pull request. 
 
 To add thumbor's remote as a valid remote for your repository:
 
-    git remote add libthumbor git://github.com/thumbor/libthumbor.git
+~~~bash
+git remote add libthumbor git://github.com/thumbor/libthumbor.git
+~~~
 
 To merge thumbor's master with your fork:
 
-    git pull libthumbor master
+~~~bash
+git pull libthumbor master
+~~~
 
 If there was anything to merge, just run your tests again. If they pass, send a pull request (http://help.github.com/send-pull-requests/).
