@@ -1,45 +1,21 @@
 language: python
 python:
-  - '2.7'
-  - '3.2'
-  - '3.3'
-  - '3.4'
-  - '3.5'
+  - 2.7
+  - 3.5
+  - 3.6
+  - 3.7
+  - 3.8
   - pypy
 cache:
   directories:
     - $HOME/.cache/pip
-sudo: false
 matrix:
   fast_finish: true
-
-addons:
-  apt:
-    packages:
-    - libcurl4-openssl-dev
-    - python-numpy
-    - python-opencv
-    - libopencv-dev
-    - libjpeg-dev
-    - libpng-dev
-    - libx264-dev
-    - libass-dev
-    - libvpx1
-    - libvpx-dev
-    - libwebp-dev
-    - webp
-    - gifsicle
-    - python-numpy
-    - python-scipy
-    - cython
 install:
   - make setup
-  # Coveralls 4.0 doesn't support Python 3.2
-  - if [ "$TRAVIS_PYTHON_VERSION" == "3.2" ]; then travis_retry pip install coverage==3.7.1; fi
   - pip install coveralls
 
 script: make ci_test
 
 after_success:
   coveralls
-

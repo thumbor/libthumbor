@@ -38,14 +38,14 @@ def generate_url(request):
     try:
         if 'width' in args:
             args['width'] = int(args['width'])
-    except ValueError as e:
+    except ValueError:
         error_message = "The width value '%s' is not an integer." % \
             args['width']
 
     try:
         if 'height' in args:
             args['height'] = int(args['height'])
-    except ValueError as e:
+    except ValueError:
         error_message = "The height value '%s' is not an integer." % \
             args['height']
 
@@ -55,13 +55,13 @@ def generate_url(request):
                 (int(args['crop_left']), int(args['crop_top'])),
                 (int(args['crop_right']), int(args['crop_bottom']))
             )
-    except KeyError as e:
+    except KeyError:
         error_message = '''
             Missing values for cropping.
             Expected all 'crop_left', 'crop_top',
             'crop_right', 'crop_bottom' values.
         '''
-    except ValueError as e:
+    except ValueError:
         error_message = '''
             Invalid values for cropping.
             Expected all 'crop_left', 'crop_top',
