@@ -32,7 +32,7 @@ It allows users to generate safe urls easily.
              ' imagemagick pil opencv',
     author='Bernardo Heynemann',
     author_email='heynemann@gmail.com',
-    url='http://github.com/heynemann/libthumbor',
+    url='http://github.com/thumbor/libthumbor',
     license='MIT',
     classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
