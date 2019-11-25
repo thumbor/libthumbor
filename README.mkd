@@ -11,16 +11,18 @@ This version is compliant with the new URL generation schema (thumbor 3.0.0 and 
 
 ## Using it
 
-    from libthumbor import CryptoURL
+```python
+from libthumbor import CryptoURL
 
-    crypto = CryptoURL(key='my-security-key')
+crypto = CryptoURL(key='my-security-key')
 
-    encrypted_url = crypto.generate(
-        width=300,
-        height=200,
-        smart=True,
-        image_url='/path/to/my/image.jpg'
-    )
+encrypted_url = crypto.generate(
+    width=300,
+    height=200,
+    smart=True,
+    image_url='/path/to/my/image.jpg'
+)
+```
 
 ## Docs
 
