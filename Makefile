@@ -15,4 +15,4 @@ flake flake8:
 	@poetry run flake8
 
 pylint lint:
-	@poetry run pylint libthumbor tests
+	@poetry run pylint --exit-zero libthumbor tests
