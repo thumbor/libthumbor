@@ -5,3 +5,4 @@ dist
 libthumbor.egg-info
 *.db
 .coverage
+/tests/testproj/db.sqlite3
