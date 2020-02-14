@@ -28,17 +28,11 @@ class CryptoURL:
         """
         Initializes the encryptor with the proper key
         :param key: secret key to use for hashing.
-        :param thread_safe: if True (default) CryptoURL will not reuse the
-                            hmac instance on every generate call,
-                            instead a copy of the hmac object will be created.
-                            Consider setting this parameter to False when only one
-                            thread has access to the CryptoURL object at a time.
         """
 
         if isinstance(key, text_type):
             key = str(key)
         self.key = key
-        self.computed_key = (key * 16)[:16]
         self.hmac = hmac.new(b(key), digestmod=hashlib.sha1)
 
     def generate_new(self, options):
