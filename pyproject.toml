@@ -1,8 +1,9 @@
 [tool.poetry]
 name = "libthumbor"
-version = "1.3.3"
+version = "2.0.0"
 description = "libthumbor is the python extension to generate thumbor URLs"
 authors = ["Bernardo Heynemann <heynemann@gmail.com>"]
+readme = "README.md"
 keywords = ["imaging", "face", "detection", "feature", "thumbor", "thumbnail", "imagemagick", "pil", "opencv"]
 license = "MIT"
 
