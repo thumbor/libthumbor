@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "libthumbor"
-version = "2.0.0"
+version = "2.0.1"
 description = "libthumbor is the python extension to generate thumbor URLs"
 authors = ["Bernardo Heynemann <heynemann@gmail.com>"]
 readme = "README.md"
