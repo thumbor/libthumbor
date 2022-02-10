@@ -13,12 +13,12 @@
 from unittest import TestCase
 
 from preggy import expect
-from six import text_type
+from six import ensure_text
 
 from libthumbor.crypto import CryptoURL
 
 IMAGE_URL = "my.server.com/some/path/to/image.jpg"
-KEY = "my-security-key"
+KEY = b"my-security-key"
 
 
 class NewFormatUrlTestsMixin:
@@ -83,7 +83,7 @@ class NewFormatUrl(TestCase, NewFormatUrlTestsMixin):
 
 class NewFormatUrlWithUnicodeKey(TestCase, NewFormatUrlTestsMixin):
     def setUp(self):
-        self.crypto = CryptoURL(text_type(KEY))
+        self.crypto = CryptoURL(ensure_text(KEY))
 
 
 class GenerateWithUnsafeTestCase(TestCase):
