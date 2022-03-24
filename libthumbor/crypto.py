@@ -31,9 +31,9 @@ class CryptoURL:
         """
 
         if isinstance(key, text_type):
-            key = str(key)
+            key = b(key)
         self.key = key
-        self.hmac = hmac.new(b(key), digestmod=hashlib.sha1)
+        self.hmac = hmac.new(self.key, digestmod=hashlib.sha1)
 
     def generate_new(self, options):
         url = plain_image_url(**options)
