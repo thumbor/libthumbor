@@ -1,7 +1,7 @@
 test ci_test: unit coverage flake8 pylint
 
 unit:
-	@poetry run pytest -n `nproc` --cov=libthumbor tests/
+	@poetry run pytest --cov=libthumbor tests/
 
 coverage:
 	@coverage report -m --fail-under=75
