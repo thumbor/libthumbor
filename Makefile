@@ -1,12 +1,10 @@
-COVERAGE = $(or $(shell which coverage), $(shell which python-coverage), coverage)
-
 test ci_test: unit coverage flake8 pylint
 
 unit:
 	@poetry run pytest -n `nproc` --cov=libthumbor tests/
 
 coverage:
-	@$(COVERAGE) report -m --fail-under=75
+	@coverage report -m --fail-under=75
 
 setup:
 	@poetry install
