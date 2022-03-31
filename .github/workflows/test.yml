@@ -24,7 +24,7 @@ jobs:
       - name: Run lint
         run: make lint flake
       - name: Generate lcov
-        run: coverage lcov
+        run: make coverage
       - name: Coveralls
         uses: coverallsapp/github-action@1.1.3
         with:

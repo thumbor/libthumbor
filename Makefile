@@ -4,7 +4,8 @@ unit:
 	@poetry run pytest --cov=libthumbor tests/
 
 coverage:
-	@coverage report -m --fail-under=75
+	@poetry run coverage report -m --fail-under=75
+	@poetry run coverage lcov
 
 setup:
 	@poetry install
