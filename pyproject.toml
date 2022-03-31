@@ -20,7 +20,7 @@ flake8 = "^3.7.9"
 pylint = "^2.4.4"
 preggy = "^1.4.4"
 pytest-cov = "^2.8.1"
-django = "^3.0.3"
+django = "^3.1.14"
 
 [tool.black]
 line-length = 88
