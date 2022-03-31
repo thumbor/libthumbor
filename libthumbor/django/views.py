@@ -36,13 +36,13 @@ def generate_url(request):
         if "width" in args:
             args["width"] = int(args["width"])
     except ValueError:
-        error_message = "The width value '%s' is not an integer." % args["width"]
+        error_message = f"The width value '{args['width']}' is not an integer."
 
     try:
         if "height" in args:
             args["height"] = int(args["height"])
     except ValueError:
-        error_message = "The height value '%s' is not an integer." % args["height"]
+        error_message = f"The height value '{args['height']}' is not an integer."
 
     try:
         if (

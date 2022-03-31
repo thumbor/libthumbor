@@ -43,7 +43,7 @@ def calculate_width_and_height(url_parts, options):
             height = "-0"
 
     if width or height:
-        url_parts.append("%sx%s" % (width, height))
+        url_parts.append(f"{width}x{height}")
 
 
 def url_for(**options):
@@ -58,8 +58,7 @@ def url_for(**options):
 
 def unsafe_url(**options):
     """Returns the unsafe url with the specified options"""
-
-    return "unsafe/%s" % plain_image_url(**options)
+    return f"unsafe/{plain_image_url(**options)}"
 
 
 def plain_image_url(**options):
@@ -96,7 +95,7 @@ def get_url_parts(**options):
 
         if crop_left > 0 or crop_top > 0 or crop_bottom > 0 or crop_right > 0:
             url_parts.append(
-                "%sx%s:%sx%s" % (crop_left, crop_top, crop_right, crop_bottom)
+                f"{crop_left}x{crop_top}:{crop_right}x{crop_bottom}"
             )
 
     calculate_fit_in(options, url_parts)
@@ -280,11 +279,11 @@ class Url:
             if isinstance(trim, bool):
                 url.append("trim")
             else:
-                url.append("trim:%s" % trim)
+                url.append(f"trim:{trim}")
 
         crop = crop_left or crop_top or crop_right or crop_bottom
         if crop:
-            url.append("%sx%s:%sx%s" % (crop_left, crop_top, crop_right, crop_bottom))
+            url.append(f"{crop_left}x{crop_top}:{crop_right}x{crop_bottom}")
 
         if fit_in:
             fit_ops = []
@@ -296,12 +295,12 @@ class Url:
             url.append("-".join(fit_ops))
 
         if horizontal_flip:
-            width = "-%s" % width
+            width = f"-{width}"
         if vertical_flip:
-            height = "-%s" % height
+            height = f"-{height}"
 
         if width or height:
-            url.append("%sx%s" % (width, height))
+            url.append(f"{width}x{height}")
 
         if halign != "center":
             url.append(halign)
@@ -312,6 +311,6 @@ class Url:
             url.append("smart")
 
         if filters:
-            url.append("filters:%s" % filters)
+            url.append(f"filters:{filters}")
 
         return "/".join(url)

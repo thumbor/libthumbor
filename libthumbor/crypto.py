@@ -43,7 +43,7 @@ class CryptoURL:
 
         if PY3:
             signature = signature.decode("ascii")
-        return "/%s/%s" % (signature, url)
+        return f"/{signature}/{url}"
 
     def generate(self, **options):
         """Generates an encrypted URL with the specified options"""

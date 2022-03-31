@@ -578,14 +578,14 @@ def test_smart_after_alignments():
 
 class UnsafeUrlTestCase(TestCase):
     def test_should_return_a_valid_unsafe_url_with_no_params(self):
-        expect("unsafe/%s" % IMAGE_URL).to_equal(unsafe_url(image_url=IMAGE_URL))
+        expect(f"unsafe/{IMAGE_URL}").to_equal(unsafe_url(image_url=IMAGE_URL))
 
     def test_should_return_an_unsafe_url_with_width_and_height(self):
-        expect("unsafe/100x140/%s" % IMAGE_URL).to_equal(
+        expect(f"unsafe/100x140/{IMAGE_URL}").to_equal(
             unsafe_url(image_url=IMAGE_URL, width=100, height=140),
         )
 
     def test_should_return_an_unsafe_url_with_crop_and_smart(self):
-        expect("unsafe/100x140/smart/%s" % IMAGE_URL).to_equal(
+        expect(f"unsafe/100x140/smart/{IMAGE_URL}").to_equal(
             unsafe_url(image_url=IMAGE_URL, width=100, height=140, smart=True),
         )
