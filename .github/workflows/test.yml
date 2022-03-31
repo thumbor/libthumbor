@@ -35,7 +35,7 @@ jobs:
       - name: Run tests
         run: make unit
       - name: Run lint
-        run: make lint flake
+        run: make lint
       - name: Generate lcov
         run: make coverage
       - name: Coveralls
