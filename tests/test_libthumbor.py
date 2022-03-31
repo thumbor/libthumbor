@@ -28,19 +28,17 @@ def test_usage_new_format():
         fit_in=False,
         horizontal_flip=False,
         vertical_flip=False,
-        halign="center",
-        valign="middle",
         crop_left=0,
         crop_top=0,
         crop_right=0,
         crop_bottom=0,
         filters=[],
     )
-    thumbor_url = ("%s/%s" % (thumbor_url, image)).lstrip("/")
+    thumbor_url = (f"{thumbor_url}/{image}").lstrip("/")
     signature = thumbor_signer.signature(thumbor_url)
     if PY3:
         signature = signature.decode("ascii")
-    thumbor_url = "/%s/%s" % (signature, thumbor_url)
+    thumbor_url = f"/{signature}/{thumbor_url}"
 
     crypto = CryptoURL(key=key)
     url = crypto.generate(width=300, height=200, smart=True, image_url=image)

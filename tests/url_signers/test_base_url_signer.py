@@ -33,7 +33,7 @@ class BaseSignerTestCase(TestCase):
     def test_can_validate_url(self):
         class TestSigner(BaseUrlSigner):
             def signature(self, url):
-                return "%s+1" % url
+                return f"{url}+1"
 
         signer = TestSigner(security_key="téste")
         expect(
