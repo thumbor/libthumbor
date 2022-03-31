@@ -94,9 +94,7 @@ def get_url_parts(**options):
         crop_bottom = crop[1][1]
 
         if crop_left > 0 or crop_top > 0 or crop_bottom > 0 or crop_right > 0:
-            url_parts.append(
-                f"{crop_left}x{crop_top}:{crop_right}x{crop_bottom}"
-            )
+            url_parts.append(f"{crop_left}x{crop_top}:{crop_right}x{crop_bottom}")
 
     calculate_fit_in(options, url_parts)
     calculate_width_and_height(url_parts, options)

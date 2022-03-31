@@ -12,8 +12,7 @@
 import logging
 
 from django.conf import settings
-from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseNotAllowed)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 
 from libthumbor.crypto import CryptoURL
 

@@ -10,8 +10,7 @@ from libthumbor.url_signers import BaseUrlSigner
 
 
 class UrlSigner(BaseUrlSigner):
-    """Validate urls and sign them using base64 hmac-sha1
-    """
+    """Validate urls and sign them using base64 hmac-sha1"""
 
     def signature(self, url):
         return base64.urlsafe_b64encode(
