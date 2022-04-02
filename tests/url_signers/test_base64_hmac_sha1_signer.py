@@ -16,7 +16,6 @@ import hmac
 from unittest import TestCase
 
 from preggy import expect
-from six import text_type
 
 from libthumbor.url_signers.base64_hmac_sha1 import UrlSigner
 
@@ -31,9 +30,7 @@ class Base64HmacSha1UrlSignerTestCase(TestCase):
         signer = UrlSigner(security_key="something")
         url = "10x11:12x13/-300x-300/center/middle/smart/some/image.jpg"
         expected = base64.urlsafe_b64encode(
-            hmac.new(
-                "something".encode(), text_type(url).encode("utf-8"), hashlib.sha1
-            ).digest()
+            hmac.new("something".encode(), url.encode("utf-8"), hashlib.sha1).digest()
         )
         actual = signer.signature(url)
         expect(actual).to_equal(expected)

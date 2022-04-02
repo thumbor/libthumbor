@@ -8,12 +8,10 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-from six import text_type
-
 
 class BaseUrlSigner:
     def __init__(self, security_key):
-        if isinstance(security_key, text_type):
+        if isinstance(security_key, str):
             security_key = security_key.encode("utf-8")
         self.security_key = security_key
 

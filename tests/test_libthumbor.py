@@ -10,8 +10,6 @@
 
 import re
 
-from six import b
-
 from libthumbor import CryptoURL, Url, Signer
 
 
@@ -56,4 +54,4 @@ def test_thumbor_can_decrypt_lib_thumbor_generated_url_new_format():
     reg = "/([^/]+)/(.+)"
     (signature, url) = re.match(reg, url).groups()
 
-    assert thumbor_signer.validate(b(signature), url)
+    assert thumbor_signer.validate(signature.encode(), url)

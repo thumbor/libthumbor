@@ -13,7 +13,6 @@
 from unittest import TestCase
 
 from preggy import expect
-from six import ensure_text
 
 from libthumbor.crypto import CryptoURL
 
@@ -83,7 +82,7 @@ class NewFormatUrl(TestCase, NewFormatUrlTestsMixin):
 
 class NewFormatUrlWithUnicodeKey(TestCase, NewFormatUrlTestsMixin):
     def setUp(self):
-        self.crypto = CryptoURL(ensure_text(KEY))
+        self.crypto = CryptoURL(KEY)
 
 
 class GenerateWithUnsafeTestCase(TestCase):
