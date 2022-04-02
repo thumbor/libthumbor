@@ -16,7 +16,7 @@ import base64
 import hashlib
 import hmac
 
-from six import PY3, b, text_type
+from six import b, text_type
 
 from libthumbor.url import plain_image_url, unsafe_url
 
@@ -39,10 +39,8 @@ class CryptoURL:
         url = plain_image_url(**options)
         _hmac = self.hmac.copy()
         _hmac.update(text_type(url).encode("utf-8"))
-        signature = base64.urlsafe_b64encode(_hmac.digest())
+        signature = base64.urlsafe_b64encode(_hmac.digest()).decode("ascii")
 
-        if PY3:
-            signature = signature.decode("ascii")
         return f"/{signature}/{url}"
 
     def generate(self, **options):

@@ -10,7 +10,7 @@
 
 import re
 
-from six import b, PY3
+from six import b
 
 from libthumbor import CryptoURL, Url, Signer
 
@@ -35,9 +35,7 @@ def test_usage_new_format():
         filters=[],
     )
     thumbor_url = (f"{thumbor_url}/{image}").lstrip("/")
-    signature = thumbor_signer.signature(thumbor_url)
-    if PY3:
-        signature = signature.decode("ascii")
+    signature = thumbor_signer.signature(thumbor_url).decode("ascii")
     thumbor_url = f"/{signature}/{thumbor_url}"
 
     crypto = CryptoURL(key=key)

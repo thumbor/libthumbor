@@ -25,6 +25,11 @@ class BaseSignerTestCase(TestCase):
         expect(signer).to_be_instance_of(BaseUrlSigner)
         expect(signer.security_key).to_equal("something")
 
+    def test_can_create_signer_with_binary_key(self):
+        signer = BaseUrlSigner(security_key=b"something")
+        expect(signer).to_be_instance_of(BaseUrlSigner)
+        expect(signer.security_key).to_equal("something")
+
     def test_can_create_unicode_signer(self):
         signer = BaseUrlSigner(security_key="téste")
         expect(signer).to_be_instance_of(BaseUrlSigner)
