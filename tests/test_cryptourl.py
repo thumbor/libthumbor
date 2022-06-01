@@ -100,3 +100,14 @@ class GenerateWithUnsafeTestCase(TestCase):
             image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=False
         )
         expect(url.startswith("unsafe")).to_be_false()
+
+
+class KeyWithSpecialCharactersTestCase(TestCase):
+    def setUp(self):
+        self.crypto = CryptoURL("cafécompãodequeijo")
+
+    def test_should_generate_url_with_key_with_special_characters(self):
+        url = self.crypto.generate(image_url=IMAGE_URL)
+        expect(url).to_equal(
+            "/MrRd4GRirTQ0JO3vM2slr4rT5Fk=/my.server.com/some/path/to/image.jpg"
+        )

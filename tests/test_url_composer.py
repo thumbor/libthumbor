@@ -576,6 +576,20 @@ def test_smart_after_alignments():
     expect("left/smart/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
 
 
+def test_no_options_specified_and_image_with_special_chars():
+    """test_no_options_specified
+    Given
+        An image URL of "my.server.com/some/path/to/image-of-pão-de-açúcar.jpg"
+    When
+        I ask my library for an URL with special chars
+    Then
+        I get "a0307329a0373ad42c1987098988573f" as URL
+    """
+    url = url_for(image_url="my.server.com/some/path/to/image-of-pão-de-açúcar.jpg")
+
+    expect(url).to_equal("a0307329a0373ad42c1987098988573f")
+
+
 class UnsafeUrlTestCase(TestCase):
     def test_should_return_a_valid_unsafe_url_with_no_params(self):
         expect(f"unsafe/{IMAGE_URL}").to_equal(unsafe_url(image_url=IMAGE_URL))
