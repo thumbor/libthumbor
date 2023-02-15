@@ -19,7 +19,7 @@ flake8 = "^4.0.1"
 pylint = "^2.13.4"
 preggy = "^1.4.4"
 pytest-cov = "^3.0"
-django = "^3.0.3"
+django = "^3.2.18"
 coverage = "^6.3.2"
 
 [tool.black]
