@@ -247,8 +247,8 @@ class Url:
     def generate_options(
         cls,
         debug=False,
-        width=0,
-        height=0,
+        width=None,
+        height=None,
         smart=False,
         meta=False,
         trim=None,
@@ -297,8 +297,10 @@ class Url:
         if vertical_flip:
             height = f"-{height}"
 
-        if width or height:
-            url.append(f"{width}x{height}")
+        if width == 0 and height == 0:
+            pass # nothing to do
+        elif width is not None or height is not None:
+            url.append(f"{ width or 0}x{height or 0}")
 
         if halign != "center":
             url.append(halign)

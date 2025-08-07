@@ -190,6 +190,18 @@ def test_smart_url():
 
     expect(url).to_equal("200x300/smart/84996242f65a4d864aceb125e1c4c5ba")
 
+def test_url_with_0():
+    url = url_for(width=0, image_url=IMAGE_URL)
+    expect(url).to_equal("0x0/84996242f65a4d864aceb125e1c4c5ba")
+
+def test_url_height_0():
+    url = url_for(height=0, image_url=IMAGE_URL)
+    expect(url).to_equal("0x0/84996242f65a4d864aceb125e1c4c5ba")
+
+def test_url_height_0_url_with_0():
+    url = url_for(height=0, width=0, image_url=IMAGE_URL)
+    expect(url).to_equal("84996242f65a4d864aceb125e1c4c5ba")
+
 
 def test_fit_in_url():
     """test_fit_in_url
