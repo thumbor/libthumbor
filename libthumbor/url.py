@@ -297,9 +297,7 @@ class Url:
         if vertical_flip:
             height = f"-{height}"
 
-        if width == 0 and height == 0:
-            pass # nothing to do
-        elif width is not None or height is not None:
+        if width is not None or height is not None:
             url.append(f"{ width or 0}x{height or 0}")
 
         if halign != "center":
