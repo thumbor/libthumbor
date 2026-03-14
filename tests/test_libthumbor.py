@@ -54,6 +54,6 @@ def test_thumbor_can_decrypt_lib_thumbor_generated_url_new_format():
     url = crypto.generate(width=300, height=200, smart=True, image_url=image)
 
     reg = "/([^/]+)/(.+)"
-    (signature, url) = re.match(reg, url).groups()
+    signature, url = re.match(reg, url).groups()
 
     assert thumbor_signer.validate(b(signature), url)
