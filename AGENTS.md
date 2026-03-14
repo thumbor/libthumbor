@@ -6,7 +6,7 @@ points that other applications can use to talk to thumbor safely.
 
 ## Dev environment setup
 
-- **Prerequisites:** Python 3.7+ and Poetry
+- **Prerequisites:** Python 3.10+ and Poetry
 - Install project and development dependencies:
 
   ```
@@ -40,7 +40,7 @@ points that other applications can use to talk to thumbor safely.
 
 ## Code style
 
-- **Formatter:** `black` with line length 88 and Python 3.7 target, configured in
+- **Formatter:** `black` with line length 88 and Python 3.10 target, configured in
   [pyproject.toml](/home/metal/work/libthumbor/pyproject.toml).
 - **Linter:** `flake8` with max complexity 20, configured in
   [.flake8](/home/metal/work/libthumbor/.flake8).

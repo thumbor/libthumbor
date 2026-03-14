@@ -5,6 +5,8 @@ libthumbor allows easy usage of
 
 This version is compliant with the new URL generation schema (thumbor 3.0.0 and up).
 
+Requires Python 3.10 or newer.
+
 ## Using it
 
 ```python
