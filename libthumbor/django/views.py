@@ -9,6 +9,7 @@
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
 """Generic view for create thumbor encrypted urls."""
+
 import logging
 
 from django.conf import settings

@@ -11,6 +11,7 @@
 # pylint: disable=no-self-use
 
 """libthumbor URL composer tests"""
+
 from unittest import TestCase
 
 from preggy import expect
