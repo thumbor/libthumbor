@@ -7,6 +7,28 @@ This version is compliant with the new URL generation schema (thumbor 3.0.0 and 
 
 Requires Python 3.10 or newer.
 
+## Development
+
+Install dependencies with:
+
+```bash
+make setup
+```
+
+Install the git hooks with:
+
+```bash
+make pre-commit-install
+```
+
+Run the local quality checks with:
+
+```bash
+make lint
+make test
+make pre-commit
+```
+
 ## Using it
 
 ```python
