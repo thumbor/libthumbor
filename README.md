@@ -1,63 +1,227 @@
-[![Build Status](https://secure.travis-ci.org/thumbor/libthumbor.png)](http://travis-ci.org/thumbor/libthumbor) [![Coverage Status](https://coveralls.io/repos/github/thumbor/libthumbor/badge.svg?branch=master)](https://coveralls.io/github/thumbor/libthumbor?branch=master)
+# libthumbor
 
-libthumbor allows easy usage of
-[thumbor](http://github.com/thumbor/thumbor) in Python. Check the docs for django integration.
+`libthumbor` is a Python library for composing, signing, and parsing
+[thumbor](https://github.com/thumbor/thumbor) image URLs.
 
-This version is compliant with the new URL generation schema (thumbor 3.0.0 and up).
+It helps applications generate thumbor-compatible URLs safely, keep signing
+logic in one place, and reuse the same URL-building rules across services.
 
-Requires Python 3.10 or newer.
+## Highlights
 
-## Development
+- Generate signed thumbor URLs with `CryptoURL`
+- Compose transformation paths with `Url.generate_options()`
+- Parse decrypted thumbor paths with `Url.parse_decrypted()`
+- Validate signatures with the bundled signer implementation
+- Use the included Django view for simple URL generation endpoints
 
-Install dependencies with:
+## Requirements
+
+- Python 3.10+
+
+## Installation
+
+```bash
+pip install libthumbor
+```
+
+For local development, use:
 
 ```bash
 make setup
 ```
 
-Install the git hooks with:
+## Quick Start
+
+Generate a signed thumbor URL:
+
+```python
+from libthumbor import CryptoURL
+
+crypto = CryptoURL(key="my-security-key")
+
+url = crypto.generate(
+    width=300,
+    height=200,
+    smart=True,
+    image_url="images.example.com/photo.jpg",
+)
+
+print(url)
+```
+
+The generated URL follows thumbor's signed URL format:
+
+```text
+/<signature>/300x200/smart/images.example.com/photo.jpg
+```
+
+Generate an unsafe URL when signing is intentionally disabled:
+
+```python
+from libthumbor.crypto import CryptoURL
+
+crypto = CryptoURL(key="my-security-key")
+
+url = crypto.generate(
+    unsafe=True,
+    width=300,
+    height=200,
+    image_url="images.example.com/photo.jpg",
+)
+
+print(url)
+```
+
+Output structure:
+
+```text
+unsafe/300x200/images.example.com/photo.jpg
+```
+
+## URL Composition
+
+If you want only the thumbor transformation path, use `Url.generate_options()`:
+
+```python
+from libthumbor import Url
+
+path = Url.generate_options(
+    width=300,
+    height=200,
+    smart=True,
+    fit_in=True,
+    halign="left",
+    valign="top",
+    filters="brightness(10):contrast(5)",
+)
+
+print(path)
+```
+
+Output:
+
+```text
+fit-in/300x200/left/top/smart/filters:brightness(10):contrast(5)
+```
+
+## Parsing Existing URLs
+
+`Url.parse_decrypted()` parses a thumbor path without the leading signature:
+
+```python
+from libthumbor import Url
+
+data = Url.parse_decrypted(
+    "meta/10x20:200x300/adaptive-full-fit-in/-400x-300/"
+    "left/top/smart/filters:brightness(100)/images.example.com/photo.jpg"
+)
+
+print(data["width"])
+print(data["height"])
+print(data["smart"])
+print(data["image"])
+```
+
+## Supported Options
+
+The library supports the transformation pieces covered by the test suite and
+thumbor-compatible URL composer:
+
+- `width`, `height`
+- `crop=((left, top), (right, bottom))`
+- `fit_in`, `full_fit_in`
+- `adaptive_fit_in`, `adaptive_full_fit_in`
+- `flip`, `flop`
+- `halign` with `left`, `center`, `right`
+- `valign` with `top`, `middle`, `bottom`
+- `smart`
+- `trim`
+- `filters`
+- `meta`
+- `unsafe`
+
+## Signature Utilities
+
+The package also exposes the bundled signer implementation:
+
+```python
+from libthumbor import Signer
+
+signer = Signer("my-security-key")
+signature = signer.signature("300x200/image.jpg").decode("ascii")
+```
+
+This is useful when you need lower-level signing or signature validation
+outside `CryptoURL`.
+
+## Django Integration
+
+`libthumbor` ships with a simple Django view that returns a generated thumbor
+URL as plain text.
+
+Settings:
+
+```python
+THUMBOR_SECURITY_KEY = "my-security-key"
+THUMBOR_SERVER = "http://localhost:8888/"
+```
+
+URL config:
+
+```python
+from django.urls import include, path
+
+urlpatterns = [
+    path("", include("libthumbor.django.urls")),
+]
+```
+
+Example request:
+
+```text
+GET /gen_url/?image_url=images.example.com/photo.jpg&width=300&height=200
+```
+
+## Development
+
+Install dependencies:
+
+```bash
+make setup
+```
+
+Install the local git hooks:
 
 ```bash
 make pre-commit-install
 ```
 
-Run the local quality checks with:
+Run the main validation flow:
 
 ```bash
-make lint
 make test
+```
+
+Run individual checks:
+
+```bash
+make unit
+make coverage
+make black
+make flake8
+make isort-check
+make pylint
 make pre-commit
 ```
 
-## Using it
+## Testing and Compatibility Notes
 
-```python
-from libthumbor import CryptoURL
+- The project targets Python 3.10 and newer.
+- URL signing is compatibility-sensitive. Changes in signing or URL composition
+  should be reviewed carefully.
+- If you change URL semantics, verify that previously generated signed URLs
+  still behave as expected.
 
-crypto = CryptoURL(key='my-security-key')
+## License
 
-encrypted_url = crypto.generate(
-    width=300,
-    height=200,
-    smart=True,
-    image_url='/path/to/my/image.jpg'
-)
-```
-
-## Docs
-
-Check the wiki for more information on using libthumbor.
-
-## Contributions
-
-### Bernardo Heynemann
-
-* Generic URL encryption
-
-### Rafael Caricio
-
-* Django Generic View and URL
-
-### Fábio Costa
-
-* Django Generic View and URL
+MIT
