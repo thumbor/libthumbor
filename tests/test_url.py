@@ -8,7 +8,7 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-# pylint: disable=line-too-long,no-self-use
+# pylint: disable=line-too-long
 
 from unittest import TestCase
 

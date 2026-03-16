@@ -21,8 +21,8 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "tests.testproj.testproj.settings"
 
 try:
     from django.conf import settings
-    from django.test import TestCase
     from django.http import QueryDict
+    from django.test import TestCase
 
     DJANGO_PRESENT = True
 except ImportError:

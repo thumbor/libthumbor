@@ -244,7 +244,7 @@ class Url:
         return values
 
     @classmethod  # NOQA
-    def generate_options(
+    def generate_options(  # pylint: disable=too-many-positional-arguments
         cls,
         debug=False,
         width=0,

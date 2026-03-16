@@ -8,8 +8,6 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
-# pylint: disable=no-self-use
-
 """libthumbor URL composer tests"""
 
 from unittest import TestCase

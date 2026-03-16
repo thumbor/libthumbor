@@ -8,8 +8,6 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-# pylint: disable=no-self-use
-
 import base64
 import hashlib
 import hmac
