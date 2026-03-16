@@ -9,19 +9,20 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-six = "^1.14.0"
+six = "^1.17.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.1.1"
-pytest-tldr = "^0.2.1"
+pytest = "^9.0.2"
+pytest-tldr = "^0.2.6"
 black = "^26.3.1"
-flake8 = "^7.1.2"
-isort = "^5.10.1"
-pylint = "^3.3.5"
+flake8 = "^7.3.0"
+isort = "^7.0.0"
+pre-commit = "^4.5.1"
+pylint = "^4.0.5"
 preggy = "^1.4.4"
-pytest-cov = "^3.0"
-django = "^4.2"
-coverage = "^6.3.2"
+pytest-cov = "^7.0.0"
+django = "^5.2.12"
+coverage = "^7.13.4"
 
 [tool.black]
 line-length = 88
