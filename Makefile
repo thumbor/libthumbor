@@ -1,7 +1,7 @@
 test ci_test: unit coverage flake8 isort-check pylint
 
 unit:
-	@poetry run pytest --cov=libthumbor tests/
+	@poetry run pytest --cov=libthumbor --cov-report= tests/
 
 coverage:
 	@poetry run coverage report -m --fail-under=75
