@@ -26,3 +26,14 @@ jobs:
         run: pip install flake8
       - name: Run flake8
         run: flake8
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+      - uses: actions/checkout@v6
+      - name: Install isort
+        run: pip install isort
+      - name: Run isort
+        run: isort --check-only --settings-file=pyproject.toml libthumbor tests

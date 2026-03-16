@@ -8,8 +8,6 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
-# pylint: disable=no-self-use
-
 from __future__ import unicode_literals
 
 from unittest import TestCase

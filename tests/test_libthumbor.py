@@ -12,7 +12,7 @@ import re
 
 from six import b
 
-from libthumbor import CryptoURL, Url, Signer
+from libthumbor import CryptoURL, Signer, Url
 
 
 def test_usage_new_format():
