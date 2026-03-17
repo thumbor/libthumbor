@@ -11,6 +11,9 @@ setup:
 	@poetry install
 	@echo "\n\nYou are strongly recommended to run 'make pre-commit-install'\n"
 
+black:
+	@poetry run black --check --verbose --config=pyproject.toml .
+
 flake flake8:
 	@poetry run flake8 --config=.flake8 libthumbor tests
 
