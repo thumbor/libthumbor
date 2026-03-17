@@ -17,9 +17,12 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAll
 
 from libthumbor.crypto import CryptoURL
 
+logger = logging.getLogger(__name__)
+
 THUMBOR_SECURITY_KEY = getattr(settings, "THUMBOR_SECURITY_KEY", "my-security-key")
 
 THUMBOR_SERVER = getattr(settings, "THUMBOR_SERVER", "http://localhost:8888/")
+INVALID_PARAMS_MESSAGE = "Invalid thumbor URL parameters."
 
 
 def generate_url(request):
@@ -69,7 +72,7 @@ def generate_url(request):
         """
 
     if error_message is not None:
-        logging.warning(error_message)
+        logger.warning(error_message)
         return HttpResponseBadRequest(error_message)
 
     try:
@@ -78,6 +81,5 @@ def generate_url(request):
             content_type="text/plain",
         )
     except (ValueError, KeyError) as error:
-        error_message = str(error)
-        logging.warning(error_message)
-        return HttpResponseBadRequest(error_message)
+        logger.warning("Invalid thumbor URL parameters: %s", error)
+        return HttpResponseBadRequest(INVALID_PARAMS_MESSAGE)

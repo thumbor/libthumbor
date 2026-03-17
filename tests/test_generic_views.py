@@ -43,6 +43,9 @@ class GenericViewsTestCase(TestCase):
     def test_without_url_param(self):
         response = self.client.get("/gen_url/")
         expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
+        expect(response.content.decode("utf-8")).to_equal(
+            "Invalid thumbor URL parameters."
+        )
 
     def test_generate_url_with_params_via_post(self):
         image_args = {"image_url": "globo.com/media/img/my_image.jpg"}
@@ -95,6 +98,9 @@ class GenericViewsTestCase(TestCase):
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
         expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
+        expect(response.content.decode("utf-8")).to_equal(
+            "Invalid thumbor URL parameters."
+        )
 
     def test_passing_only_one_crop_value(self):
         self.url_query.update(
