@@ -9,6 +9,7 @@
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
 from six import text_type
+import secrets
 
 
 class BaseUrlSigner:
@@ -19,7 +20,7 @@ class BaseUrlSigner:
 
     def validate(self, actual_signature, url):
         url_signature = self.signature(url)
-        return url_signature == actual_signature
+        return secrets.compare_digest(url_signature, actual_signature)
 
     def signature(self, url):
         raise NotImplementedError()
