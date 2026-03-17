@@ -64,7 +64,7 @@ tests/                   <- pytest suite
   test_url_composer.py   <- URL builder coverage
   test_generic_views.py  <- Django integration coverage
 README.md                <- project overview and usage example
-CONTRIBUTING             <- legacy contribution notes
+CONTRIBUTING.md          <- contribution workflow notes
 Makefile                 <- common setup, test, and lint tasks
 pyproject.toml           <- Poetry metadata and tool configuration
 ```
@@ -74,7 +74,7 @@ pyproject.toml           <- Poetry metadata and tool configuration
 - Keep changes focused and update tests whenever behavior changes.
 - Prefer `make test` before opening a PR, and at minimum run the target that
   covers the code you changed.
-- `CONTRIBUTING` contains older workflow guidance; when in doubt, follow the
+- `CONTRIBUTING.md` contains contribution workflow guidance; when in doubt, follow the
   current Poetry-based commands defined in the Makefile.
 - New work should target `master` unless the maintainers document a different
   release branch strategy.
