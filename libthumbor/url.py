@@ -23,18 +23,18 @@ AVAILABLE_VALIGN = ["top", "middle", "bottom"]
 
 def calculate_width_and_height(url_parts, options):
     """Appends width and height information to url"""
-    width = options.get("width", 0)
-    has_width = width
-    height = options.get("height", 0)
-    has_height = height
+    width = options.get("width", None)
+    has_width = bool(width)
+    height = options.get("height", None)
+    has_height = bool(height)
 
     flip = options.get("flip", False)
     flop = options.get("flop", False)
 
     if flip:
-        width = width * -1
+        width = (width or 0) * -1
     if flop:
-        height = height * -1
+        height = (height or 0) * -1
 
     if not has_width and not has_height:
         if flip:
@@ -42,8 +42,8 @@ def calculate_width_and_height(url_parts, options):
         if flop:
             height = "-0"
 
-    if width or height:
-        url_parts.append(f"{width}x{height}")
+    if width is not None or height is not None:
+        url_parts.append(f"{ width or 0}x{height or 0}")
 
 
 def url_for(**options):
@@ -247,8 +247,8 @@ class Url:
     def generate_options(  # pylint: disable=too-many-positional-arguments
         cls,
         debug=False,
-        width=0,
-        height=0,
+        width=None,
+        height=None,
         smart=False,
         meta=False,
         trim=None,
@@ -297,8 +297,8 @@ class Url:
         if vertical_flip:
             height = f"-{height}"
 
-        if width or height:
-            url.append(f"{width}x{height}")
+        if width is not None or height is not None:
+            url.append(f"{ width or 0}x{height or 0}")
 
         if halign != "center":
             url.append(halign)
