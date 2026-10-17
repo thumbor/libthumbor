@@ -604,3 +604,9 @@ class UnsafeUrlTestCase(TestCase):
         expect(f"unsafe/100x140/smart/{IMAGE_URL}").to_equal(
             unsafe_url(image_url=IMAGE_URL, width=100, height=140, smart=True),
         )
+
+
+def test_url_for_with_non_ascii_image_url():
+    expect(url_for(image_url="example.com/日本.jpg")).to_equal(
+        "18f3625a70ea0a67ebc3d00a3fbb7cc9"
+    )

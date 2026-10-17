@@ -13,8 +13,8 @@
 from unittest import TestCase
 
 from preggy import expect
-from six import ensure_text
 
+from libthumbor import Signer
 from libthumbor.crypto import CryptoURL
 
 IMAGE_URL = "my.server.com/some/path/to/image.jpg"
@@ -83,7 +83,7 @@ class NewFormatUrl(TestCase, NewFormatUrlTestsMixin):
 
 class NewFormatUrlWithUnicodeKey(TestCase, NewFormatUrlTestsMixin):
     def setUp(self):
-        self.crypto = CryptoURL(ensure_text(KEY))
+        self.crypto = CryptoURL(KEY.decode("utf-8"))
 
 
 class GenerateWithUnsafeTestCase(TestCase):
@@ -101,3 +101,19 @@ class GenerateWithUnsafeTestCase(TestCase):
             image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=False
         )
         expect(url.startswith("unsafe")).to_be_false()
+
+
+class NonAsciiKeyTests(TestCase):
+    def test_signature_matches_the_signer_used_by_thumbor(self):
+        key = "chave-ação-日本"
+        url = "300x200/" + IMAGE_URL
+        generated = CryptoURL(key).generate(image_url=IMAGE_URL, width=300, height=200)
+        expected = Signer(key).signature(url).decode("ascii")
+        expect(generated).to_equal(f"/{expected}/{url}")
+
+    def test_non_ascii_image_url(self):
+        key = "my-security-key"
+        url = "example.com/日本.jpg"
+        generated = CryptoURL(key).generate(image_url=url)
+        expected = Signer(key).signature(url).decode("ascii")
+        expect(generated).to_equal(f"/{expected}/{url}")

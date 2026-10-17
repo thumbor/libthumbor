@@ -10,13 +10,9 @@
 
 """Encrypted URLs for thumbor encryption."""
 
-from __future__ import absolute_import
-
 import base64
 import hashlib
 import hmac
-
-from six import b, text_type
 
 from libthumbor.url import plain_image_url, unsafe_url
 
@@ -30,15 +26,15 @@ class CryptoURL:
         :param key: secret key to use for hashing.
         """
 
-        if isinstance(key, text_type):
-            key = b(key)
+        if isinstance(key, str):
+            key = key.encode("utf-8")
         self.key = key
         self.hmac = hmac.new(self.key, digestmod=hashlib.sha1)
 
     def generate_new(self, options):
         url = plain_image_url(**options)
         _hmac = self.hmac.copy()
-        _hmac.update(text_type(url).encode("utf-8"))
+        _hmac.update(url.encode("utf-8"))
         signature = base64.urlsafe_b64encode(_hmac.digest()).decode("ascii")
 
         return f"/{signature}/{url}"

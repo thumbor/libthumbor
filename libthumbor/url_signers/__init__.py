@@ -10,23 +10,21 @@
 
 import hmac
 
-from six import text_type
-
 
 def _as_bytes(value):
-    if isinstance(value, text_type):
+    if isinstance(value, str):
         return value.encode("utf-8")
     return value
 
 
 class BaseUrlSigner:
     def __init__(self, security_key):
-        if isinstance(security_key, text_type):
+        if isinstance(security_key, str):
             security_key = security_key.encode("utf-8")
         self.security_key = security_key
 
     def validate(self, actual_signature, url):
-        if not isinstance(actual_signature, (text_type, bytes, bytearray)):
+        if not isinstance(actual_signature, (str, bytes, bytearray)):
             return False
         return hmac.compare_digest(
             _as_bytes(self.signature(url)), _as_bytes(actual_signature)
