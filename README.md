@@ -182,6 +182,19 @@ Example request:
 GET /gen_url/?image_url=images.example.com/photo.jpg&width=300&height=200
 ```
 
+The view only reads a fixed set of query parameters: `image_url`, `width`,
+`height`, `halign`, `valign`, `filters` (colon-separated), the crop
+coordinates and the boolean flags (`smart`, `meta`, `trim`, `flip`, `flop`
+and the `fit_in` variants, accepting `1`/`0`, `true`/`false`, `yes`/`no`,
+`on`/`off`). Anything else, including `unsafe`, is ignored. Error responses
+are `text/plain` and never echo the submitted values.
+
+Treat the view as a signing oracle: anyone who can reach it obtains a valid
+signature for any `image_url`, which makes the thumbor security key
+irrelevant for those callers. Put it behind authentication and restrict the
+origins thumbor is allowed to load (`ALLOWED_SOURCES`) before exposing it.
+The view raises `ImproperlyConfigured` when `THUMBOR_SECURITY_KEY` is unset.
+
 ## Development
 
 Install dependencies:
