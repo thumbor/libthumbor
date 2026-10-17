@@ -27,5 +27,5 @@ repos:
     hooks:
       - id: pylint
         language: system
-        args: [--rcfile=./.pylintrc, --exit-zero, libthumbor, tests]
+        args: [--rcfile=./.pylintrc, libthumbor, tests]
         pass_filenames: false

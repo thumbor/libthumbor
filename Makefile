@@ -21,7 +21,7 @@ isort isort-check:
 	@poetry run isort --check-only --settings-file=pyproject.toml libthumbor tests
 
 pylint:
-	@poetry run pylint --exit-zero libthumbor tests
+	@poetry run pylint libthumbor tests
 
 pre-commit-install:
 	@poetry run pre-commit install
