@@ -16,7 +16,7 @@ logic in one place, and reuse the same URL-building rules across services.
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.11+
 
 ## Installation
 
@@ -216,7 +216,7 @@ make pre-commit
 
 ## Testing and Compatibility Notes
 
-- The project targets Python 3.10 and newer.
+- The project targets Python 3.11 and newer.
 - URL signing is compatibility-sensitive. Changes in signing or URL composition
   should be reviewed carefully.
 - If you change URL semantics, verify that previously generated signed URLs

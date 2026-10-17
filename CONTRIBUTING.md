@@ -15,7 +15,7 @@ that workflow, GitHub's fork documentation is a good place to start:
 
 Use Poetry so your local environment matches the project's tooling and CI.
 
-- Python 3.10 or newer
+- Python 3.11 or newer
 - Poetry
 
 Install the project and development dependencies with:
