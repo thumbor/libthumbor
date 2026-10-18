@@ -1,32 +1,32 @@
 test ci_test: unit coverage flake8 isort-check pylint
 
 unit:
-	@poetry run pytest --cov=libthumbor --cov-report= tests/
+	@uv run pytest --cov=libthumbor --cov-report= tests/
 
 coverage:
-	@poetry run coverage report -m --fail-under=75
-	@poetry run coverage lcov
+	@uv run coverage report -m --fail-under=75
+	@uv run coverage lcov
 
 setup:
-	@poetry install
+	@uv sync
 	@echo "\n\nYou are strongly recommended to run 'make pre-commit-install'\n"
 
 black:
-	@poetry run black --check --verbose --config=pyproject.toml .
+	@uv run black --check --verbose --config=pyproject.toml .
 
 flake flake8:
-	@poetry run flake8 --config=.flake8 libthumbor tests
+	@uv run flake8 --config=.flake8 libthumbor tests
 
 isort isort-check:
-	@poetry run isort --check-only --settings-file=pyproject.toml libthumbor tests
+	@uv run isort --check-only --settings-file=pyproject.toml libthumbor tests
 
 pylint:
-	@poetry run pylint libthumbor tests
+	@uv run pylint libthumbor tests
 
 pre-commit-install:
-	@poetry run pre-commit install
+	@uv run pre-commit install
 
 pre-commit:
-	@poetry run pre-commit run --all-files
+	@uv run pre-commit run --all-files
 
 lint: flake8 isort-check pylint

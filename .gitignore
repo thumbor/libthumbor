@@ -2,6 +2,7 @@
 *.pyc
 .DS_Store
 dist
+.venv
 libthumbor.egg-info
 *.db
 .coverage
