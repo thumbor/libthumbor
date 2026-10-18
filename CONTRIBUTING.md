@@ -13,12 +13,15 @@ that workflow, GitHub's fork documentation is a good place to start:
 
 ## Dependencies
 
-Use Poetry so your local environment matches the project's tooling and CI.
+Use [uv](https://docs.astral.sh/uv/) so your local environment matches the
+project's tooling and CI.
 
 - Python 3.11 or newer
-- Poetry
+- uv
 
-Install the project and development dependencies with:
+Install the project and development dependencies with the following
+command. uv reads `.python-version` and installs that interpreter if it is
+not available yet:
 
 ```bash
 make setup

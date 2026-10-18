@@ -1,27 +1,44 @@
-[tool.poetry]
+[project]
 name = "libthumbor"
 version = "2.0.2"
 description = "libthumbor is the python extension to generate thumbor URLs"
-authors = ["Bernardo Heynemann <heynemann@gmail.com>"]
+authors = [{ name = "Bernardo Heynemann", email = "heynemann@gmail.com" }]
 readme = "README.md"
 keywords = ["imaging", "face", "detection", "feature", "thumbor", "thumbnail", "imagemagick", "pil", "opencv"]
 license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11,<4.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+]
+dependencies = []
 
-[tool.poetry.dependencies]
-python = "^3.11"
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2,<10",
+    "pytest-tldr>=0.2.6,<0.3",
+    "black>=26.3.1,<27",
+    "flake8>=7.3.0,<8",
+    "isort>=7,<10",
+    "pre-commit>=4.5.1,<5",
+    "pylint>=4.0.5,<5",
+    "preggy>=1.4.4,<2",
+    "pytest-cov>=7.0.0,<8",
+    "django>=5.2.12,<6",
+    "coverage>=7.13.4,<8",
+]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^9.0.2"
-pytest-tldr = "^0.2.6"
-black = "^26.3.1"
-flake8 = "^7.3.0"
-isort = ">=7,<10"
-pre-commit = "^4.5.1"
-pylint = "^4.0.5"
-preggy = "^1.4.4"
-pytest-cov = "^7.0.0"
-django = "^5.2.12"
-coverage = "^7.13.4"
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
 
 [tool.black]
 line-length = 88
@@ -48,7 +65,3 @@ exclude = '''
 [tool.isort]
 profile = "black"
 line_length = 88
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

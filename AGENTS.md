@@ -6,16 +6,16 @@ points that other applications can use to talk to thumbor safely.
 
 ## Dev environment setup
 
-- **Prerequisites:** Python 3.11+ and Poetry
+- **Prerequisites:** Python 3.11+ and uv
 - Install project and development dependencies:
 
   ```
   make setup
   ```
 
-  Equivalent to: `poetry install`
+  Equivalent to: `uv sync`
 
-- If you prefer running commands directly, use `poetry run ...` so the virtual
+- If you prefer running commands directly, use `uv run ...` so the virtual
   environment stays consistent with CI and local development.
 
 ## Running tests
@@ -66,7 +66,8 @@ tests/                   <- pytest suite
 README.md                <- project overview and usage example
 CONTRIBUTING.md          <- contribution workflow notes
 Makefile                 <- common setup, test, and lint tasks
-pyproject.toml           <- Poetry metadata and tool configuration
+pyproject.toml           <- project metadata, dependencies and tool configuration
+uv.lock                  <- locked dependency versions
 ```
 
 ## Contribution guidelines
@@ -75,7 +76,7 @@ pyproject.toml           <- Poetry metadata and tool configuration
 - Prefer `make test` before opening a PR, and at minimum run the target that
   covers the code you changed.
 - `CONTRIBUTING.md` contains contribution workflow guidance; when in doubt, follow the
-  current Poetry-based commands defined in the Makefile.
+  current uv-based commands defined in the Makefile.
 - New work should target `master` unless the maintainers document a different
   release branch strategy.
 
