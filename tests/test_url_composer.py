@@ -10,7 +10,8 @@
 
 """libthumbor URL composer tests"""
 
-from unittest import TestCase
+import hashlib
+from unittest import TestCase, mock
 
 from preggy import expect
 
@@ -32,6 +33,21 @@ def test_no_options_specified():
     url = url_for(image_url=IMAGE_URL)
 
     expect(url).to_equal(IMAGE_MD5)
+
+
+def test_url_for_marks_md5_as_not_used_for_security():
+    """test_url_for_marks_md5_as_not_used_for_security
+    Given
+        An image URL of "my.server.com/some/path/to/image.jpg"
+    When
+        I ask my library for an URL
+    Then
+        The image URL is hashed with md5 and usedforsecurity=False
+    """
+    with mock.patch("libthumbor.url.hashlib.md5", wraps=hashlib.md5) as md5:
+        url_for(image_url=IMAGE_URL)
+
+    expect(md5.call_args.kwargs).to_equal({"usedforsecurity": False})
 
 
 def test_url_raises_if_no_url():

@@ -8,7 +8,15 @@
 # http://www.opensource.org/licenses/mit-license
 # Copyright (c) 2011 globo.com timehome@corp.globo.com
 
+import hmac
+
 from six import text_type
+
+
+def _as_bytes(value):
+    if isinstance(value, text_type):
+        return value.encode("utf-8")
+    return value
 
 
 class BaseUrlSigner:
@@ -18,8 +26,11 @@ class BaseUrlSigner:
         self.security_key = security_key
 
     def validate(self, actual_signature, url):
-        url_signature = self.signature(url)
-        return url_signature == actual_signature
+        if not isinstance(actual_signature, (text_type, bytes, bytearray)):
+            return False
+        return hmac.compare_digest(
+            _as_bytes(self.signature(url)), _as_bytes(actual_signature)
+        )
 
     def signature(self, url):
         raise NotImplementedError()
