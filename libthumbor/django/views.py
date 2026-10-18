@@ -42,7 +42,15 @@ FALSE_VALUES = frozenset(("0", "false", "no", "off", ""))
 
 
 class InvalidParameter(ValueError):
-    """A query string parameter could not be converted to a thumbor option."""
+    """A query string parameter could not be converted to a thumbor option.
+
+    ``message`` is sent to the client as is, so it must never include the
+    submitted value.
+    """
+
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
 
 
 def get_security_key():
@@ -127,7 +135,7 @@ def generate_url(request):
         options = parse_options(request.GET)
     except InvalidParameter as error:
         logger.warning("Invalid thumbor URL parameters: %s", error)
-        return HttpResponseBadRequest(str(error), content_type="text/plain")
+        return HttpResponseBadRequest(error.message, content_type="text/plain")
 
     try:
         url = crypto.generate(**options)
