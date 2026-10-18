@@ -15,10 +15,12 @@
 import hashlib
 import re
 
-from six import b
-
 AVAILABLE_HALIGN = ["left", "center", "right"]
 AVAILABLE_VALIGN = ["top", "middle", "bottom"]
+
+
+def _int_or_0(value):
+    return 0 if value is None else int(value)
 
 
 def calculate_width_and_height(url_parts, options):
@@ -50,7 +52,9 @@ def url_for(**options):
     """Returns the url for the specified options"""
 
     url_parts = get_url_parts(**options)
-    image_hash = hashlib.md5(b(options["image_url"])).hexdigest()
+    image_hash = hashlib.md5(
+        options["image_url"].encode("utf-8"), usedforsecurity=False
+    ).hexdigest()
     url_parts.append(image_hash)
 
     return "/".join(url_parts)
@@ -197,6 +201,7 @@ class Url:
 
     @classmethod
     def parse_decrypted(cls, url):
+        """Returns the options in a thumbor path, or None if it cannot be parsed"""
         if cls.compiled_regex:
             reg = cls.compiled_regex
         else:
@@ -207,31 +212,33 @@ class Url:
         if not result:
             return None
 
-        result = result.groupdict()
+        try:
+            return cls._values_from_match(result.groupdict())
+        except ValueError:
+            return None
 
-        def int_or_0(value):
-            return 0 if value is None else int(value)
-
+    @classmethod
+    def _values_from_match(cls, result):
         adaptive = (result.get("adaptive", "") or "").startswith("adaptive")
         full = (result.get("full", "") or "").startswith("full")
 
-        values = {
+        return {
             "debug": result["debug"] == "debug",
             "meta": result["meta"] == "meta",
             "trim": result["trim"],
             "crop": {
-                "left": int_or_0(result["crop_left"]),
-                "top": int_or_0(result["crop_top"]),
-                "right": int_or_0(result["crop_right"]),
-                "bottom": int_or_0(result["crop_bottom"]),
+                "left": _int_or_0(result["crop_left"]),
+                "top": _int_or_0(result["crop_top"]),
+                "right": _int_or_0(result["crop_right"]),
+                "bottom": _int_or_0(result["crop_bottom"]),
             },
             "adaptive": adaptive,
             "full": full,
             "fit_in": result["fit_in"] == "fit-in",
-            "width": result["width"] == "orig" and "orig" or int_or_0(result["width"]),
+            "width": result["width"] == "orig" and "orig" or _int_or_0(result["width"]),
             "height": result["height"] == "orig"
             and "orig"
-            or int_or_0(result["height"]),
+            or _int_or_0(result["height"]),
             "horizontal_flip": result["horizontal_flip"] == "-",
             "vertical_flip": result["vertical_flip"] == "-",
             "halign": result["halign"] or "center",
@@ -240,8 +247,6 @@ class Url:
             "filters": result["filters"] or "",
             "image": "image" in result and result["image"] or None,
         }
-
-        return values
 
     @classmethod  # NOQA
     def generate_options(  # pylint: disable=too-many-positional-arguments

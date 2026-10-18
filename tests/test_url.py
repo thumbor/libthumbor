@@ -148,3 +148,9 @@ class UrlTestCase(TestCase):
         expect(url).to_equal(
             "debug/meta/trim:300x200/100x100:400x400/adaptive-full-fit-in/-300x-200/left/top/smart/filters:brightness(100)"
         )
+
+    def test_parse_decrypted_with_more_digits_than_int_accepts(self):
+        too_long = "9" * 5000
+
+        expect(Url.parse_decrypted(f"{too_long}x10/image.jpg")).to_be_null()
+        expect(Url.parse_decrypted(f"1x1:{too_long}x1/image.jpg")).to_be_null()

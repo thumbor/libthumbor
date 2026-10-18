@@ -9,7 +9,6 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-six = "^1.17.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.2"
