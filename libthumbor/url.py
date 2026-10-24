@@ -43,29 +43,114 @@ KNOWN_OPTIONS = frozenset(
 )
 
 
+FIT_IN_SEGMENTS = {
+    "fit_in": "fit-in",
+    "full_fit_in": "full-fit-in",
+    "adaptive_fit_in": "adaptive-fit-in",
+    "adaptive_full_fit_in": "adaptive-full-fit-in",
+}
+TRUE_VALUES = frozenset(("1", "true", "yes", "on"))
+FALSE_VALUES = frozenset(("0", "false", "no", "off", ""))
+TRIM_PATTERN = re.compile(r"(?:(?:top-left|bottom-right)(?::\d+)?|\d+)")
+
+
 def _int_or_0(value):
     return 0 if value is None else int(value)
 
 
+def read_flag(options, name):
+    """Reads a boolean option, accepting the strings the Django view accepts."""
+    value = options.get(name, False)
+    if not isinstance(value, str):
+        return bool(value)
+    normalized = value.strip().lower()
+    if normalized in TRUE_VALUES:
+        return True
+    if normalized in FALSE_VALUES:
+        return False
+    raise ValueError(f"The {name} option must be a boolean.")
+
+
+def _is_digits(value):
+    return isinstance(value, str) and value.isascii() and value.isdigit()
+
+
+def _dimension(options, name):
+    value = options.get(name)
+    if value is None:
+        return 0
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    if _is_digits(value) or value == "orig":
+        return value
+    raise ValueError(f'The {name} option must be an integer or "orig".')
+
+
 def _flipped(dimension):
     # Negating 0 or a string such as "300" or "orig" would drop the sign.
-    if isinstance(dimension, (int, float)) and dimension:
+    if isinstance(dimension, int) and dimension:
         return -dimension
     return f"-{dimension or 0}"
 
 
 def calculate_width_and_height(url_parts, options):
     """Appends width and height information to url"""
-    width = options.get("width", 0)
-    height = options.get("height", 0)
+    width = _dimension(options, "width")
+    height = _dimension(options, "height")
 
-    if options.get("flip", False):
+    if read_flag(options, "flip"):
         width = _flipped(width)
-    if options.get("flop", False):
+    if read_flag(options, "flop"):
         height = _flipped(height)
 
     if width or height:
         url_parts.append(f"{width}x{height}")
+
+
+def _crop_value(value):
+    if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+        return value
+    if _is_digits(value):
+        return int(value)
+    raise ValueError("The crop values must be non-negative integers.")
+
+
+def _crop_segment(crop):
+    if not crop:
+        return None
+    (left, top), (right, bottom) = crop
+    left, top, right, bottom = (_crop_value(v) for v in (left, top, right, bottom))
+    if not (left or top or right or bottom):
+        return None
+    return f"{left}x{top}:{right}x{bottom}"
+
+
+def _trim_segment(trim):
+    if isinstance(trim, bool) or trim is None:
+        return "trim" if trim else None
+    if isinstance(trim, str):
+        body = trim
+    elif isinstance(trim, (tuple, list)) and len(trim) == 2:
+        body = ":".join(str(bit) for bit in trim if bit)
+    else:
+        raise ValueError(
+            "The trim option must be True, a string or a (position, tolerance) pair."
+        )
+    if not body:
+        return "trim"
+    if not TRIM_PATTERN.fullmatch(body):
+        raise ValueError(
+            'The trim option accepts "top-left" or "bottom-right" and a tolerance.'
+        )
+    return f"trim:{body}"
+
+
+def _filters_segment(filters):
+    if not filters:
+        return None
+    if isinstance(filters, str):
+        return f"filters:{filters}"
+    return ":".join(["filters", *filters])
 
 
 def url_for(**options):
@@ -106,48 +191,34 @@ def plain_image_url(**options):
 def _resolve_aliases(options):
     """Maps the Url.generate_options names, which thumbor-url passes, onto ours."""
     options = dict(options)
-    if options.pop("horizontal_flip", False):
+    if read_flag(options, "horizontal_flip"):
         options["flip"] = True
-    if options.pop("vertical_flip", False):
+    if read_flag(options, "vertical_flip"):
         options["flop"] = True
     crop = [options.pop(name, None) for name in CROP_ALIASES]
     if options.get("crop") is None and any(crop):
-        left, top, right, bottom = (int(value or 0) for value in crop)
+        left, top, right, bottom = (value or 0 for value in crop)
         options["crop"] = ((left, top), (right, bottom))
     return options
 
 
 def get_url_parts(**options):
-    if "image_url" not in options:
+    if not options.get("image_url"):
         raise ValueError("The image_url argument is mandatory.")
 
     options = _resolve_aliases(options)
     url_parts = []
 
-    if options.get("debug", False):
-        url_parts.append("debug")
+    for name in ("debug", "meta"):
+        if read_flag(options, name):
+            url_parts.append(name)
 
-    if options.get("meta", False):
-        url_parts.append("meta")
-
-    trim = options.get("trim", None)
-    if trim:
-        bits = ["trim"]
-        if not isinstance(trim, bool):
-            bits.append(trim[0] if trim[0] else "")
-            if trim[1]:
-                bits.append(str(trim[1]))
-        url_parts.append(":".join(bits))
-
-    crop = options.get("crop", None)
-    if crop:
-        crop_left = crop[0][0]
-        crop_top = crop[0][1]
-        crop_right = crop[1][0]
-        crop_bottom = crop[1][1]
-
-        if crop_left > 0 or crop_top > 0 or crop_bottom > 0 or crop_right > 0:
-            url_parts.append(f"{crop_left}x{crop_top}:{crop_right}x{crop_bottom}")
+    for segment in (
+        _trim_segment(options.get("trim")),
+        _crop_segment(options.get("crop")),
+    ):
+        if segment:
+            url_parts.append(segment)
 
     calculate_fit_in(options, url_parts)
     calculate_width_and_height(url_parts, options)
@@ -171,44 +242,30 @@ def get_url_parts(**options):
     if valign != "middle":
         url_parts.append(valign)
 
-    if options.get("smart", False):
+    if read_flag(options, "smart"):
         url_parts.append("smart")
 
-    if options.get("filters", False):
-        filters_string = ["filters"]
-        for filter_value in options["filters"]:
-            filters_string.append(filter_value)
-        url_parts.append(":".join(filters_string))
+    filters = _filters_segment(options.get("filters"))
+    if filters:
+        url_parts.append(filters)
 
     return url_parts
 
 
 def calculate_fit_in(options, url_parts):
-    fit_in = False
-    full_fit_in = False
-
-    if options.get("fit_in", None):
-        fit_in = True
-        url_parts.append("fit-in")
-
-    if options.get("full_fit_in", None):
-        full_fit_in = True
-        url_parts.append("full-fit-in")
-
-    if options.get("adaptive_fit_in", None):
-        fit_in = True
-        url_parts.append("adaptive-fit-in")
-
-    if options.get("adaptive_full_fit_in", None):
-        full_fit_in = True
-        url_parts.append("adaptive-full-fit-in")
-
-    if (fit_in or full_fit_in) and not (
-        options.get("width", None) or options.get("height", None)
-    ):
+    segments = [
+        segment for name, segment in FIT_IN_SEGMENTS.items() if read_flag(options, name)
+    ]
+    if len(segments) > 1:
+        raise ValueError(
+            "Only one of fit_in, full_fit_in, adaptive_fit_in and "
+            "adaptive_full_fit_in can be set."
+        )
+    if segments and not (options.get("width") or options.get("height")):
         raise ValueError(
             "When using fit-in or full-fit-in, you must specify width and/or height."
         )
+    url_parts.extend(segments)
 
 
 class Url:
