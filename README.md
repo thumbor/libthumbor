@@ -202,7 +202,12 @@ outside `CryptoURL`.
 ## Django Integration
 
 `libthumbor` ships with a simple Django view that returns a generated thumbor
-URL as plain text.
+URL as plain text. Install it with the `django` extra, which declares the
+supported range (Django 5.2 LTS and 6.x):
+
+```bash
+pip install "libthumbor[django]"
+```
 
 Settings:
 
