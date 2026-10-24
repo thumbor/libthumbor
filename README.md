@@ -78,6 +78,49 @@ Output structure:
 unsafe/300x200/images.example.com/photo.jpg
 ```
 
+## Image URLs From Untrusted Input
+
+`CryptoURL` signs `image_url` exactly as given, and thumbor reads options from
+the whole path. When the value comes from a user or a request, an `image_url`
+such as `filters:format(png)/photo.jpg` adds a `filters` option to the signed
+URL. Characters a browser percent-encodes in a path (spaces, non-ASCII
+letters, `?`, `#`) break the signature instead, because thumbor checks it
+against the path it receives rather than the string that was signed.
+
+Percent-encode such values before signing, slashes included:
+
+```python
+from urllib.parse import quote
+
+from libthumbor import CryptoURL
+
+crypto = CryptoURL(key="my-security-key")
+
+url = crypto.generate(
+    width=300,
+    height=200,
+    image_url=quote("images.example.com/photo of the day.jpg", safe=""),
+)
+```
+
+```text
+/<signature>/300x200/images.example.com%2Fphoto%20of%20the%20day.jpg
+```
+
+The `safe=""` matters: `quote()` keeps `/` by default, which still lets a
+value such as `smart/photo.jpg` add the `smart` option.
+
+thumbor decodes the image URL once before loading it, so the file and HTTP
+loaders receive the original value and `ALLOWED_SOURCES` still applies to it.
+Pass the decoded value: a path that is already percent-encoded, such as
+`photo%20of%20the%20day.jpg` taken from a request URL, would be encoded again,
+and thumbor would look for a file with a literal `%20` in its name. Run such
+values through `unquote()` first.
+
+The encoded path differs from the unencoded one (`/` becomes `%2F`), so
+switching existing callers produces new URLs; the ones generated before keep
+working.
+
 ## URL Composition
 
 If you want only the thumbor transformation path, use `Url.generate_options()`:
