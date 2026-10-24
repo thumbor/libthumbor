@@ -15,6 +15,7 @@ import warnings
 
 AVAILABLE_HALIGN = ["left", "center", "right"]
 AVAILABLE_VALIGN = ["top", "middle", "bottom"]
+CROP_ALIASES = ("crop_left", "crop_top", "crop_right", "crop_bottom")
 
 
 def _int_or_0(value):
@@ -77,10 +78,25 @@ def plain_image_url(**options):
     return "/".join(url_parts)
 
 
+def _resolve_aliases(options):
+    """Maps the Url.generate_options names, which thumbor-url passes, onto ours."""
+    options = dict(options)
+    if options.pop("horizontal_flip", False):
+        options["flip"] = True
+    if options.pop("vertical_flip", False):
+        options["flop"] = True
+    crop = [options.pop(name, None) for name in CROP_ALIASES]
+    if options.get("crop") is None and any(crop):
+        left, top, right, bottom = (int(value or 0) for value in crop)
+        options["crop"] = ((left, top), (right, bottom))
+    return options
+
+
 def get_url_parts(**options):
     if "image_url" not in options:
         raise ValueError("The image_url argument is mandatory.")
 
+    options = _resolve_aliases(options)
     url_parts = []
 
     if options.get("meta", False):
