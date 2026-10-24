@@ -13,6 +13,7 @@ import hashlib
 import numbers
 import re
 import warnings
+from dataclasses import dataclass
 
 AVAILABLE_HALIGN = ["left", "center", "right"]
 AVAILABLE_VALIGN = ["top", "middle", "bottom"]
@@ -91,25 +92,11 @@ def _dimension(options, name):
     raise ValueError(f'The {name} option must be an integer or "orig".')
 
 
-def _flipped(dimension):
-    # Negating 0 or a string such as "300" or "orig" would drop the sign.
-    if isinstance(dimension, int) and dimension:
-        return -dimension
-    return f"-{dimension or 0}"
-
-
-def calculate_width_and_height(url_parts, options):
-    """Appends width and height information to url"""
-    width = _dimension(options, "width")
-    height = _dimension(options, "height")
-
-    if read_flag(options, "flip"):
-        width = _flipped(width)
-    if read_flag(options, "flop"):
-        height = _flipped(height)
-
-    if width or height:
-        url_parts.append(f"{width}x{height}")
+def _signed(dimension, flipped):
+    # A negative number has always meant a flipped dimension.
+    if isinstance(dimension, int) and dimension < 0:
+        return -dimension, not flipped
+    return dimension, flipped
 
 
 def _crop_value(value):
@@ -118,7 +105,7 @@ def _crop_value(value):
     raise ValueError("The crop values must be non-negative integers.")
 
 
-def _crop_segment(crop):
+def _crop(crop):
     if not crop:
         return None
     try:
@@ -127,17 +114,16 @@ def _crop_segment(crop):
         raise ValueError(
             "The crop option must be a ((left, top), (right, bottom)) pair."
         ) from error
-    left, top, right, bottom = (_crop_value(v) for v in (left, top, right, bottom))
-    if not (left or top or right or bottom):
-        return None
-    return f"{left}x{top}:{right}x{bottom}"
+    sides = tuple(_crop_value(value) for value in (left, top, right, bottom))
+    return sides if any(sides) else None
 
 
-def _trim_segment(trim):
+def _trim(trim):
+    """Returns the text after "trim:", "" for a plain trim, or None for no trim."""
     if not trim:
         return None
     if trim is True:
-        return "trim"
+        return ""
     if isinstance(trim, str):
         body = trim
     elif isinstance(trim, (tuple, list)) and len(trim) == 2:
@@ -146,27 +132,25 @@ def _trim_segment(trim):
         raise ValueError(
             "The trim option must be True, a string or a (position, tolerance) pair."
         )
-    if not body:
-        return "trim"
-    if not TRIM_PATTERN.fullmatch(body):
+    if body and not TRIM_PATTERN.fullmatch(body):
         raise ValueError(
             'The trim option accepts "top-left" or "bottom-right" and a tolerance.'
         )
-    return f"trim:{body}"
+    return body
 
 
-def _filters_segment(filters):
+def _filters(filters):
     if not filters:
         return None
     if isinstance(filters, str):
-        return f"filters:{filters}"
+        return filters
     try:
-        return ":".join(["filters", *filters])
+        return ":".join(filters)
     except TypeError as error:
         raise ValueError("The filters option must be a string or a list.") from error
 
 
-def _alignment_segments(halign, valign):
+def _check_alignment(halign, valign):
     if halign not in AVAILABLE_HALIGN:
         raise ValueError(
             'Only "left", "center" and "right" are'
@@ -177,11 +161,125 @@ def _alignment_segments(halign, valign):
             'Only "top", "middle" and "bottom" are'
             + " valid values for vertical alignment."
         )
-    return [
-        segment
-        for segment, default in ((halign, "center"), (valign, "middle"))
-        if segment != default
+
+
+@dataclass(frozen=True)
+class _Path:  # pylint: disable=too-many-instance-attributes
+    """The options part of a thumbor path, one field per segment of its regex.
+
+    CryptoURL, Url.generate_options and Url.parse_decrypted all go through it,
+    so the three cannot disagree on how a path is written.
+    """
+
+    debug: bool = False
+    meta: bool = False
+    trim: str | None = None
+    crop: tuple[int, int, int, int] | None = None
+    fit_in: str | None = None
+    width: int | str = 0
+    height: int | str = 0
+    horizontal_flip: bool = False
+    vertical_flip: bool = False
+    halign: str = "center"
+    valign: str = "middle"
+    smart: bool = False
+    filters: str | None = None
+
+    def segments(self):
+        parts = [name for name in ("debug", "meta") if getattr(self, name)]
+        if self.trim is not None:
+            parts.append(f"trim:{self.trim}" if self.trim else "trim")
+        if self.crop is not None:
+            left, top, right, bottom = self.crop
+            parts.append(f"{left}x{top}:{right}x{bottom}")
+        if self.fit_in:
+            parts.append(self.fit_in)
+        if self.width or self.height or self.horizontal_flip or self.vertical_flip:
+            width = f"{'-' if self.horizontal_flip else ''}{self.width}"
+            height = f"{'-' if self.vertical_flip else ''}{self.height}"
+            parts.append(f"{width}x{height}")
+        parts.extend(
+            segment
+            for segment, default in ((self.halign, "center"), (self.valign, "middle"))
+            if segment != default
+        )
+        if self.smart:
+            parts.append("smart")
+        if self.filters:
+            parts.append(f"filters:{self.filters}")
+        return parts
+
+
+def _resolve_aliases(options):
+    """Maps the Url.generate_options names, which thumbor-url passes, onto ours."""
+    options = dict(options)
+    if read_flag(options, "horizontal_flip"):
+        options["flip"] = True
+    if read_flag(options, "vertical_flip"):
+        options["flop"] = True
+    crop = [options.pop(name, None) for name in CROP_ALIASES]
+    if options.get("crop") is None and any(crop):
+        left, top, right, bottom = (value or 0 for value in crop)
+        options["crop"] = ((left, top), (right, bottom))
+    return options
+
+
+def _fit_in(options):
+    segments = [
+        segment for name, segment in FIT_IN_SEGMENTS.items() if read_flag(options, name)
     ]
+    if len(segments) > 1:
+        raise ValueError(
+            "Only one of fit_in, full_fit_in, adaptive_fit_in and "
+            "adaptive_full_fit_in can be set."
+        )
+    if segments and not (_dimension(options, "width") or _dimension(options, "height")):
+        raise ValueError(
+            "When using fit-in or full-fit-in, you must specify width and/or height."
+        )
+    return segments[0] if segments else None
+
+
+def _fit_in_with_modifiers(options):
+    """Reads fit-in the way Url.generate_options spells it: a flag plus modifiers."""
+    adaptive = read_flag(options, "adaptive")
+    full = read_flag(options, "full")
+    if not read_flag(options, "fit_in"):
+        if adaptive or full:
+            raise ValueError("The adaptive and full options require fit_in.")
+        return None
+    return "adaptive-" * adaptive + "full-" * full + "fit-in"
+
+
+def _build_path(options, read_fit_in):
+    options = _resolve_aliases(options)
+    debug = read_flag(options, "debug")
+    meta = read_flag(options, "meta")
+    trim = _trim(options.get("trim"))
+    crop = _crop(options.get("crop"))
+    fit_in = read_fit_in(options)
+    width = _dimension(options, "width")
+    height = _dimension(options, "height")
+    width, horizontal_flip = _signed(width, read_flag(options, "flip"))
+    height, vertical_flip = _signed(height, read_flag(options, "flop"))
+    halign = options.get("halign", "center")
+    valign = options.get("valign", "middle")
+    _check_alignment(halign, valign)
+    return _Path(
+        debug=debug,
+        meta=meta,
+        trim=trim,
+        crop=crop,
+        fit_in=fit_in,
+        width=width,
+        height=height,
+        horizontal_flip=horizontal_flip,
+        vertical_flip=vertical_flip,
+        halign=halign,
+        valign=valign,
+        smart=read_flag(options, "smart"),
+        filters=_filters(options.get("filters")),
+    )
 
 
 def url_for(**options):
@@ -219,71 +317,11 @@ def plain_image_url(**options):
     return "/".join(url_parts)
 
 
-def _resolve_aliases(options):
-    """Maps the Url.generate_options names, which thumbor-url passes, onto ours."""
-    options = dict(options)
-    if read_flag(options, "horizontal_flip"):
-        options["flip"] = True
-    if read_flag(options, "vertical_flip"):
-        options["flop"] = True
-    crop = [options.pop(name, None) for name in CROP_ALIASES]
-    if options.get("crop") is None and any(crop):
-        left, top, right, bottom = (value or 0 for value in crop)
-        options["crop"] = ((left, top), (right, bottom))
-    return options
-
-
 def get_url_parts(**options):
     if not options.get("image_url"):
         raise ValueError("The image_url argument is mandatory.")
 
-    options = _resolve_aliases(options)
-    url_parts = []
-
-    for name in ("debug", "meta"):
-        if read_flag(options, name):
-            url_parts.append(name)
-
-    for segment in (
-        _trim_segment(options.get("trim")),
-        _crop_segment(options.get("crop")),
-    ):
-        if segment:
-            url_parts.append(segment)
-
-    calculate_fit_in(options, url_parts)
-    calculate_width_and_height(url_parts, options)
-
-    url_parts.extend(
-        _alignment_segments(
-            options.get("halign", "center"), options.get("valign", "middle")
-        )
-    )
-
-    if read_flag(options, "smart"):
-        url_parts.append("smart")
-
-    filters = _filters_segment(options.get("filters"))
-    if filters:
-        url_parts.append(filters)
-
-    return url_parts
-
-
-def calculate_fit_in(options, url_parts):
-    segments = [
-        segment for name, segment in FIT_IN_SEGMENTS.items() if read_flag(options, name)
-    ]
-    if len(segments) > 1:
-        raise ValueError(
-            "Only one of fit_in, full_fit_in, adaptive_fit_in and "
-            "adaptive_full_fit_in can be set."
-        )
-    if segments and not (_dimension(options, "width") or _dimension(options, "height")):
-        raise ValueError(
-            "When using fit-in or full-fit-in, you must specify width and/or height."
-        )
-    url_parts.extend(segments)
+    return _build_path(options, _fit_in).segments()
 
 
 class Url:
@@ -336,40 +374,64 @@ class Url:
         if not result:
             return None
 
+        groups = result.groupdict()
         try:
-            return cls._values_from_match(result.groupdict())
+            path = cls._path_from_match(groups)
         except ValueError:
             return None
+        return cls._parsed(path, groups["image"])
 
-    @classmethod
-    def _values_from_match(cls, result):
-        adaptive = (result.get("adaptive", "") or "").startswith("adaptive")
-        full = (result.get("full", "") or "").startswith("full")
+    @staticmethod
+    def _path_from_match(groups):
+        crop = [groups[f"crop_{side}"] for side in ("left", "top", "right", "bottom")]
+        fit_in = None
+        if groups["fit_in"]:
+            fit_in = f"{groups['adaptive'] or ''}{groups['full'] or ''}fit-in"
+        width, height = (
+            groups[name] if groups[name] == "orig" else _int_or_0(groups[name])
+            for name in ("width", "height")
+        )
+        return _Path(
+            debug=groups["debug"] == "debug",
+            meta=groups["meta"] == "meta",
+            trim=None if groups["trim"] is None else groups["trim"].partition(":")[2],
+            crop=None if crop[0] is None else tuple(int(side) for side in crop),
+            fit_in=fit_in,
+            width=width,
+            height=height,
+            horizontal_flip=groups["horizontal_flip"] == "-",
+            vertical_flip=groups["vertical_flip"] == "-",
+            halign=groups["halign"] or "center",
+            valign=groups["valign"] or "middle",
+            smart=groups["smart"] == "smart",
+            filters=groups["filters"],
+        )
 
+    @staticmethod
+    def _parsed(path, image):
+        trim = None
+        if path.trim is not None:
+            trim = f"trim:{path.trim}" if path.trim else "trim"
+        fit_in = path.fit_in or ""
         return {
-            "debug": result["debug"] == "debug",
-            "meta": result["meta"] == "meta",
-            "trim": result["trim"],
-            "crop": {
-                "left": _int_or_0(result["crop_left"]),
-                "top": _int_or_0(result["crop_top"]),
-                "right": _int_or_0(result["crop_right"]),
-                "bottom": _int_or_0(result["crop_bottom"]),
-            },
-            "adaptive": adaptive,
-            "full": full,
-            "fit_in": result["fit_in"] == "fit-in",
-            "width": result["width"] == "orig" and "orig" or _int_or_0(result["width"]),
-            "height": result["height"] == "orig"
-            and "orig"
-            or _int_or_0(result["height"]),
-            "horizontal_flip": result["horizontal_flip"] == "-",
-            "vertical_flip": result["vertical_flip"] == "-",
-            "halign": result["halign"] or "center",
-            "valign": result["valign"] or "middle",
-            "smart": result["smart"] == "smart",
-            "filters": result["filters"] or "",
-            "image": "image" in result and result["image"] or None,
+            "debug": path.debug,
+            "meta": path.meta,
+            "trim": trim,
+            "crop": dict(
+                zip(("left", "top", "right", "bottom"), path.crop or (0, 0, 0, 0))
+            ),
+            "adaptive": fit_in.startswith("adaptive-"),
+            "full": "full-" in fit_in,
+            "fit_in": bool(fit_in),
+            "width": path.width,
+            "height": path.height,
+            "horizontal_flip": path.horizontal_flip,
+            "vertical_flip": path.vertical_flip,
+            "halign": path.halign,
+            "valign": path.valign,
+            "smart": path.smart,
+            "filters": path.filters or "",
+            "image": image,
         }
 
     @classmethod  # NOQA
@@ -394,49 +456,24 @@ class Url:
         crop_bottom=None,
         filters=None,
     ):
-        url = []
-
-        if debug:
-            url.append("debug")
-
-        if meta:
-            url.append("meta")
-
-        for segment in (
-            _trim_segment(trim),
-            _crop_segment(
-                ((crop_left or 0, crop_top or 0), (crop_right or 0, crop_bottom or 0))
-            ),
-        ):
-            if segment:
-                url.append(segment)
-
-        if (adaptive or full) and not fit_in:
-            raise ValueError("The adaptive and full options require fit_in.")
-        if fit_in:
-            fit_ops = []
-            if adaptive:
-                fit_ops.append("adaptive")
-            if full:
-                fit_ops.append("full")
-            fit_ops.append("fit-in")
-            url.append("-".join(fit_ops))
-
-        if horizontal_flip:
-            width = f"-{width}"
-        if vertical_flip:
-            height = f"-{height}"
-
-        if width or height:
-            url.append(f"{width}x{height}")
-
-        url.extend(_alignment_segments(halign, valign))
-
-        if smart:
-            url.append("smart")
-
-        filters = _filters_segment(filters)
-        if filters:
-            url.append(filters)
-
-        return "/".join(url)
+        options = {
+            "debug": debug,
+            "width": width,
+            "height": height,
+            "smart": smart,
+            "meta": meta,
+            "trim": trim,
+            "adaptive": adaptive,
+            "full": full,
+            "fit_in": fit_in,
+            "horizontal_flip": horizontal_flip,
+            "vertical_flip": vertical_flip,
+            "halign": halign,
+            "valign": valign,
+            "crop_left": crop_left,
+            "crop_top": crop_top,
+            "crop_right": crop_right,
+            "crop_bottom": crop_bottom,
+            "filters": filters,
+        }
+        return "/".join(_build_path(options, _fit_in_with_modifiers).segments())
