@@ -44,6 +44,7 @@ make black
 make flake8
 make isort-check
 make pylint
+make mypy
 ```
 
 ## Pull Requests
