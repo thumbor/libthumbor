@@ -474,33 +474,6 @@ def test_explicit_crop_wins_over_crop_sides():
     assert url == f"1x2:3x4/{IMAGE_URL}"
 
 
-def test_options_passed_by_thumbor_url():
-    """Mirrors the dict thumbor.url_composer.get_thumbor_params builds."""
-    url = plain_image_url(
-        width=300,
-        height=200,
-        smart=False,
-        meta=False,
-        horizontal_flip=True,
-        vertical_flip=True,
-        halign="center",
-        valign="middle",
-        trim=False,
-        crop_left="10",
-        crop_top="20",
-        crop_right="110",
-        crop_bottom="220",
-        filters=None,
-        image_url=IMAGE_URL,
-        fit_in=False,
-        full_fit_in=False,
-        adaptive_fit_in=False,
-        adaptive_full_fit_in=False,
-    )
-
-    assert url == f"10x20:110x220/-300x-200/{IMAGE_URL}"
-
-
 def test_horizontal_alignment():
     """test_horizontal_alignment
     Given

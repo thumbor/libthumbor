@@ -10,8 +10,9 @@
 import base64
 import hashlib
 import hmac
+import warnings
 
-from libthumbor.url import plain_image_url, unsafe_url
+from libthumbor.url import KNOWN_OPTIONS, plain_image_url, unsafe_url
 
 
 class CryptoURL:
@@ -38,6 +39,15 @@ class CryptoURL:
 
     def generate(self, **options):
         """Generates an encrypted URL with the specified options"""
+
+        unknown = sorted(options.keys() - KNOWN_OPTIONS)
+        if unknown:
+            warnings.warn(
+                f"Ignoring unknown thumbor URL options: {', '.join(unknown)}. "
+                "Unknown options will raise an error in libthumbor 3.0.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
         if options.get("unsafe", False):
             return unsafe_url(**options)
