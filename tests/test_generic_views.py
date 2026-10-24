@@ -17,14 +17,16 @@ from libthumbor.crypto import CryptoURL
 os.environ["DJANGO_SETTINGS_MODULE"] = "tests.testproj.testproj.settings"
 
 try:
+    import django
     from django.conf import settings
     from django.core.exceptions import ImproperlyConfigured
     from django.http import QueryDict
     from django.test import TestCase, override_settings
-
-    DJANGO_PRESENT = True
 except ImportError:
     DJANGO_PRESENT = False
+else:
+    django.setup()
+    DJANGO_PRESENT = True
 
 
 HTTP_NOT_FOUND = 404
