@@ -610,6 +610,12 @@ def test_proper_meta():
     assert url == f"meta/{IMAGE_URL}"
 
 
+def test_debug_comes_before_meta():
+    url = plain_image_url(debug=True, meta=True, width=10, image_url=IMAGE_URL)
+
+    assert url == f"debug/meta/10x0/{IMAGE_URL}"
+
+
 def test_trim_standard():
     url = plain_image_url(trim=True, image_url=IMAGE_URL)
     assert url == f"trim/{IMAGE_URL}"

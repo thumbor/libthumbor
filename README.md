@@ -182,6 +182,7 @@ thumbor-compatible URL composer:
 - `trim`
 - `filters`
 - `meta`
+- `debug`
 - `unsafe`
 
 ## Signature Utilities
