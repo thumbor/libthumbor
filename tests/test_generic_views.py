@@ -20,7 +20,8 @@ try:
     from django.conf import settings
     from django.core.exceptions import ImproperlyConfigured
     from django.http import QueryDict
-    from django.test import TestCase, override_settings
+    from django.test import RequestFactory, TestCase, override_settings
+    from django.urls import resolve
 except ImportError:
     DJANGO_PRESENT = False
 else:
@@ -32,6 +33,8 @@ HTTP_NOT_FOUND = 404
 HTTP_METHOD_NOT_ALLOWED = 405
 HTTP_OK = 200
 HTTP_BAD_REQUEST = 400
+HTTP_FORBIDDEN = 403
+VALIDATOR = "tests.testproj.testproj.thumbor.validate_thumbor_url"
 
 
 def body(response):
@@ -282,3 +285,72 @@ class GenericViewsTestCase(TestCase):
         assert body(response) == (
             "https://img.example.com/" + crypto.generate(**image_args).strip("/")
         )
+
+
+@override_settings(THUMBOR_URL_VALIDATOR=VALIDATOR)
+class UrlValidatorTestCase(TestCase):
+    def signed_in_get(self, query):
+        request = RequestFactory().get("/gen_url/", query)
+        request.user = type("User", (), {"is_authenticated": True})()
+        return resolve("/gen_url/").func(request)
+
+    def test_rejects_with_forbidden_when_the_validator_denies(self):
+        response = self.client.get("/gen_url/?image_url=images.example.com/a.jpg")
+
+        assert response.status_code == HTTP_FORBIDDEN
+
+    def test_rejects_with_bad_request_and_the_validator_message(self):
+        response = self.signed_in_get({"image_url": "evil.example.com/a.jpg"})
+
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert response["Content-Type"] == "text/plain"
+        assert body(response) == "Images must come from images.example.com."
+
+    def test_validator_compares_the_host_not_a_prefix(self):
+        for image_url in (
+            "images.example.com.evil.com/a.jpg",
+            "evil.com/images.example.com/a.jpg",
+            "images.example.com@evil.com/a.jpg",
+            "http://evil.com/?images.example.com/a.jpg",
+        ):
+            response = self.signed_in_get({"image_url": image_url})
+
+            assert response.status_code == HTTP_BAD_REQUEST, image_url
+
+        response = self.signed_in_get({"image_url": "http://images.example.com/a.jpg"})
+        assert response.status_code == HTTP_OK
+
+    def test_validator_sees_the_parsed_options(self):
+        response = self.signed_in_get(
+            {"image_url": "images.example.com/a.jpg", "filters": "blur(2)"}
+        )
+
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert body(response) == "Filters are not allowed."
+
+    def test_accepted_requests_are_signed(self):
+        crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
+        image_args = {"image_url": "images.example.com/a.jpg", "width": 300}
+
+        response = self.signed_in_get(image_args)
+
+        assert response.status_code == HTTP_OK
+        assert body(response) == (
+            settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/")
+        )
+
+    def test_validator_can_be_a_callable(self):
+        calls = []
+
+        with override_settings(
+            THUMBOR_URL_VALIDATOR=lambda request, options: calls.append(options)
+        ):
+            response = self.client.get("/gen_url/?image_url=a.jpg&width=300")
+
+        assert response.status_code == HTTP_OK
+        assert calls == [{"image_url": "a.jpg", "width": 300}]
+
+    def test_unimportable_validator(self):
+        with override_settings(THUMBOR_URL_VALIDATOR="tests.missing.validate"):
+            with pytest.raises(ImproperlyConfigured):
+                self.client.get("/gen_url/?image_url=a.jpg")
