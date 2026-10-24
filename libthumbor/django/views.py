@@ -12,6 +12,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.utils.module_loading import import_string
 
 from libthumbor.crypto import CryptoURL
 
@@ -39,10 +40,12 @@ FALSE_VALUES = frozenset(("0", "false", "no", "off", ""))
 
 
 class InvalidParameter(ValueError):
-    """A query string parameter could not be converted to a thumbor option.
+    """A request was rejected with a 400 response.
 
-    ``message`` is sent to the client as is, so it must never include the
-    submitted value.
+    Raised when a query string parameter cannot be converted to a thumbor
+    option, and meant to be raised by a THUMBOR_URL_VALIDATOR to reject a
+    request. ``message`` is sent to the client as is, so it must never include
+    the submitted value.
     """
 
     def __init__(self, message):
@@ -60,6 +63,22 @@ def get_security_key():
 def get_thumbor_server():
     server = getattr(settings, "THUMBOR_SERVER", DEFAULT_THUMBOR_SERVER)
     return server.rstrip("/") + "/"
+
+
+def get_url_validator():
+    validator = getattr(settings, "THUMBOR_URL_VALIDATOR", None)
+    if isinstance(validator, str):
+        try:
+            validator = import_string(validator)
+        except ImportError as error:
+            raise ImproperlyConfigured(
+                "The THUMBOR_URL_VALIDATOR setting could not be imported."
+            ) from error
+    if validator is not None and not callable(validator):
+        raise ImproperlyConfigured(
+            "The THUMBOR_URL_VALIDATOR setting must be a callable or its dotted path."
+        )
+    return validator
 
 
 def parse_integer(name, value):
@@ -128,8 +147,12 @@ def generate_url(request):
 
     crypto = CryptoURL(get_security_key())
 
+    validator = get_url_validator()
+
     try:
         options = parse_options(request.GET)
+        if validator is not None:
+            validator(request, options)
     except InvalidParameter as error:
         logger.warning("Invalid thumbor URL parameters: %s", error)
         return HttpResponseBadRequest(error.message, content_type="text/plain")
