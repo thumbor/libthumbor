@@ -11,6 +11,7 @@
 
 import hashlib
 import re
+import warnings
 
 AVAILABLE_HALIGN = ["left", "center", "right"]
 AVAILABLE_VALIGN = ["top", "middle", "bottom"]
@@ -46,7 +47,18 @@ def calculate_width_and_height(url_parts, options):
 
 
 def url_for(**options):
-    """Returns the url for the specified options"""
+    """Returns the options path with the image URL replaced by its MD5.
+
+    Deprecated: this was the payload of the encrypted URL format that neither
+    libthumbor nor thumbor supports anymore. Use CryptoURL.generate() instead.
+    """
+    warnings.warn(
+        "url_for() is deprecated and will be removed in libthumbor 3.0. It builds "
+        "the payload of the encrypted URL format thumbor no longer supports; use "
+        "CryptoURL.generate() for signed URLs.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     url_parts = get_url_parts(**options)
     image_hash = hashlib.md5(
