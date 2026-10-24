@@ -7,12 +7,10 @@
 
 """Encrypted URLs for thumbor encryption."""
 
-import base64
-import hashlib
-import hmac
 import warnings
 
 from libthumbor.url import KNOWN_OPTIONS, plain_image_url, unsafe_url
+from libthumbor.url_signers.base64_hmac_sha1 import UrlSigner
 
 
 class CryptoURL:
@@ -24,16 +22,12 @@ class CryptoURL:
         :param key: secret key to use for hashing.
         """
 
-        if isinstance(key, str):
-            key = key.encode("utf-8")
-        self.key = key
-        self.hmac = hmac.new(self.key, digestmod=hashlib.sha1)
+        self.signer = UrlSigner(key)
+        self.key = self.signer.security_key
 
     def generate_new(self, options):
         url = plain_image_url(**options)
-        _hmac = self.hmac.copy()
-        _hmac.update(url.encode("utf-8"))
-        signature = base64.urlsafe_b64encode(_hmac.digest()).decode("ascii")
+        signature = self.signer.signature(url).decode("ascii")
 
         return f"/{signature}/{url}"
 

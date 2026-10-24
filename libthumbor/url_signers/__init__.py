@@ -18,6 +18,11 @@ class BaseUrlSigner:
     def __init__(self, security_key):
         if isinstance(security_key, str):
             security_key = security_key.encode("utf-8")
+        if not isinstance(security_key, (bytes, bytearray)):
+            raise TypeError(
+                "security_key must be str, bytes or bytearray, "
+                f"not {type(security_key).__name__}"
+            )
         self.security_key = security_key
 
     def validate(self, actual_signature, url):

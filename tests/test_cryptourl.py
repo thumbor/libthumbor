@@ -102,6 +102,10 @@ class GenerateWithUnsafeTestCase(TestCase):
 
 
 class NonAsciiKeyTests(TestCase):
+    def test_invalid_key_fails_on_construction(self):
+        with pytest.raises(TypeError):
+            CryptoURL(None)
+
     def test_signature_matches_the_signer_used_by_thumbor(self):
         key = "chave-ação-日本"
         url = "300x200/" + IMAGE_URL
