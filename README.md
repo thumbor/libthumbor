@@ -13,6 +13,7 @@ logic in one place, and reuse the same URL-building rules across services.
 - Parse decrypted thumbor paths with `Url.parse_decrypted()`
 - Validate signatures with the bundled signer implementation
 - Use the included Django view for simple URL generation endpoints
+- Type hints for the public API, checked by mypy (`py.typed`)
 
 ## Requirements
 
@@ -159,11 +160,14 @@ data = Url.parse_decrypted(
     "left/top/smart/filters:brightness(100)/images.example.com/photo.jpg"
 )
 
-print(data["width"])
-print(data["height"])
-print(data["smart"])
-print(data["image"])
+if data is not None:
+    print(data["width"])
+    print(data["height"])
+    print(data["smart"])
+    print(data["image"])
 ```
+
+It returns `None` for a path it cannot parse.
 
 ## Supported Options
 
@@ -312,6 +316,7 @@ make black
 make flake8
 make isort-check
 make pylint
+make mypy
 make pre-commit
 ```
 
