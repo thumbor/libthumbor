@@ -4,7 +4,7 @@ unit:
 	@uv run pytest --cov=libthumbor --cov-report= tests/
 
 coverage:
-	@uv run coverage report -m --fail-under=75
+	@uv run coverage report -m --fail-under=100
 	@uv run coverage lcov
 
 setup:
