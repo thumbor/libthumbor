@@ -46,6 +46,15 @@ make isort-check
 make pylint
 ```
 
+The default environment uses Django 5.2 LTS. To run the suite against Django
+6, which needs Python 3.12 or newer, sync the `django6` group instead and
+keep `uv run` from syncing back to the default groups:
+
+```bash
+uv sync --python 3.12 --no-default-groups --group dev --group django6
+UV_NO_SYNC=1 make unit
+```
+
 ## Pull Requests
 
 Before opening a pull request:
