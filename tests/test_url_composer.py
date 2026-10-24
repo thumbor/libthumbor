@@ -8,11 +8,13 @@
 """libthumbor URL composer tests"""
 
 import hashlib
+import numbers
+import re
 from unittest import TestCase, mock
 
 import pytest
 
-from libthumbor.url import plain_image_url, unsafe_url, url_for
+from libthumbor.url import Url, plain_image_url, unsafe_url, url_for
 
 IMAGE_URL = "my.server.com/some/path/to/image.jpg"
 IMAGE_MD5 = "84996242f65a4d864aceb125e1c4c5ba"
@@ -606,7 +608,135 @@ def test_trim_pixel_only():
 
 def test_trim_tolerance_only():
     url = plain_image_url(trim=(None, 15), image_url=IMAGE_URL)
-    assert url == f"trim::15/{IMAGE_URL}"
+    assert url == f"trim:15/{IMAGE_URL}"
+
+
+def test_trim_as_a_string():
+    url = plain_image_url(trim="bottom-right:10", image_url=IMAGE_URL)
+    assert url == f"trim:bottom-right:10/{IMAGE_URL}"
+
+
+def test_trim_without_position_or_tolerance():
+    url = plain_image_url(trim=(None, None), image_url=IMAGE_URL)
+    assert url == f"trim/{IMAGE_URL}"
+
+
+def test_every_trim_form_is_read_by_thumbor():
+    regex = re.compile(Url.regex(has_unsafe_or_hash=False))
+    for trim in (True, "top-left", "15", ("bottom-right", 10), (None, 15)):
+        url = plain_image_url(trim=trim, image_url=IMAGE_URL)
+        assert regex.match(url)["trim"] == url.split("/", maxsplit=1)[0]
+
+
+def test_invalid_trim():
+    for trim in ("x", "trim:top-left", 5):
+        with pytest.raises(ValueError):
+            plain_image_url(trim=trim, image_url=IMAGE_URL)
+
+
+def test_falsy_trim_is_ignored():
+    for trim in ("", 0, None, False):
+        assert plain_image_url(trim=trim, image_url=IMAGE_URL) == IMAGE_URL
+
+
+def test_none_dimension_counts_as_zero():
+    url = plain_image_url(width=None, height=200, image_url=IMAGE_URL)
+    assert url == f"0x200/{IMAGE_URL}"
+
+
+def test_zero_dimension_as_a_digit_string_counts_as_zero():
+    assert plain_image_url(width="0", height="0", image_url=IMAGE_URL) == IMAGE_URL
+    with pytest.raises(ValueError, match="you must specify width and/or height"):
+        plain_image_url(fit_in=True, width="0", image_url=IMAGE_URL)
+
+
+def test_dimensions_as_digit_strings_are_normalized():
+    url = plain_image_url(width="007", height="20", flip=True, image_url=IMAGE_URL)
+    assert url == f"-7x20/{IMAGE_URL}"
+
+
+class Integer:
+    def __init__(self, value):
+        self.value = value
+
+    def __int__(self):
+        return self.value
+
+    def __index__(self):
+        return self.value
+
+    def __ge__(self, other):
+        return self.value >= other
+
+
+numbers.Integral.register(Integer)
+
+
+def test_integral_values_that_are_not_int():
+    url = plain_image_url(
+        width=Integer(300),
+        crop=((Integer(1), 2), (3, 4)),
+        image_url=IMAGE_URL,
+    )
+    assert url == f"1x2:3x4/300x0/{IMAGE_URL}"
+
+
+def test_invalid_dimensions():
+    for width in ("abc", " 300", 300.0, True):
+        with pytest.raises(ValueError, match="width option must be an integer"):
+            plain_image_url(width=width, image_url=IMAGE_URL)
+
+
+def test_flags_accept_the_strings_the_django_view_accepts():
+    url = plain_image_url(
+        smart="false", flip="0", meta="yes", width=300, image_url=IMAGE_URL
+    )
+    assert url == f"meta/300x0/{IMAGE_URL}"
+
+
+def test_invalid_flag():
+    with pytest.raises(ValueError, match="smart option must be a boolean"):
+        plain_image_url(smart="maybe", image_url=IMAGE_URL)
+
+
+def test_filters_as_a_string():
+    url = plain_image_url(filters="blur(2):grayscale()", image_url=IMAGE_URL)
+    assert url == f"filters:blur(2):grayscale()/{IMAGE_URL}"
+
+
+def test_crop_values_as_digit_strings():
+    url = plain_image_url(crop=(("10", "20"), ("30", "40")), image_url=IMAGE_URL)
+    assert url == f"10x20:30x40/{IMAGE_URL}"
+
+
+def test_invalid_crop_values():
+    for crop in (((-1, 0), (10, 10)), ((1.5, 0), (2, 2)), (("a", 0), (2, 2))):
+        with pytest.raises(ValueError, match="crop values must be non-negative"):
+            plain_image_url(crop=crop, image_url=IMAGE_URL)
+
+
+def test_malformed_crop():
+    for crop in (((1, 2), (3,)), "10x20:30x40", 5):
+        with pytest.raises(ValueError, match="crop option must be a"):
+            plain_image_url(crop=crop, image_url=IMAGE_URL)
+
+
+def test_invalid_filters():
+    with pytest.raises(ValueError, match="filters option must be a string"):
+        plain_image_url(filters=5, image_url=IMAGE_URL)
+
+
+def test_empty_image_url():
+    for image_url in ("", None):
+        with pytest.raises(ValueError, match="image_url argument is mandatory"):
+            plain_image_url(image_url=image_url)
+
+
+def test_only_one_fit_in_variant():
+    with pytest.raises(ValueError, match="Only one of fit_in"):
+        plain_image_url(
+            fit_in=True, adaptive_fit_in=True, width=300, image_url=IMAGE_URL
+        )
 
 
 def test_manual_crop_1():
