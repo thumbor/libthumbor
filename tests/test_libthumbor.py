@@ -6,6 +6,7 @@
 # Copyright (c) 2011 Bernardo Heynemann heynemann@gmail.com
 
 import re
+from urllib.parse import quote
 
 from libthumbor import CryptoURL, Signer, Url
 
@@ -52,3 +53,15 @@ def test_thumbor_can_decrypt_lib_thumbor_generated_url_new_format():
     signature, url = re.match(reg, url).groups()
 
     assert thumbor_signer.validate(signature.encode("utf-8"), url)
+
+
+def test_percent_encoded_image_url_is_not_parsed_as_options():
+    image = quote("smart/filters:format(png)/a.jpg", safe="")
+    crypto = CryptoURL(key="my-security-key")
+
+    url = crypto.generate(width=300, height=200, image_url=image)
+    match = re.match(Url.regex(), url)
+
+    assert match["smart"] is None
+    assert match["filters"] is None
+    assert match["image"] == image
