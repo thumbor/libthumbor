@@ -420,6 +420,87 @@ def test_flip_flop_with_string_dimensions():
     assert url == f"-300x-orig/{IMAGE_URL}"
 
 
+def test_horizontal_and_vertical_flip_are_aliases_of_flip_and_flop():
+    url = plain_image_url(
+        horizontal_flip=True, vertical_flip=True, width=300, image_url=IMAGE_URL
+    )
+
+    assert url == f"-300x-0/{IMAGE_URL}"
+
+
+def test_crop_sides_are_an_alias_of_crop():
+    url = plain_image_url(
+        crop_left="10",
+        crop_top="20",
+        crop_right="30",
+        crop_bottom="40",
+        image_url=IMAGE_URL,
+    )
+
+    assert url == f"10x20:30x40/{IMAGE_URL}"
+
+
+def test_zero_crop_sides_add_no_crop():
+    url = plain_image_url(
+        crop_left=0, crop_top=0, crop_right=0, crop_bottom=0, image_url=IMAGE_URL
+    )
+
+    assert url == IMAGE_URL
+
+
+def test_crop_sides_apply_when_crop_is_none():
+    url = plain_image_url(
+        crop=None,
+        crop_left="10",
+        crop_top="20",
+        crop_right="30",
+        crop_bottom="40",
+        image_url=IMAGE_URL,
+    )
+
+    assert url == f"10x20:30x40/{IMAGE_URL}"
+
+
+def test_explicit_crop_wins_over_crop_sides():
+    url = plain_image_url(
+        crop=((1, 2), (3, 4)),
+        crop_left="10",
+        crop_top="20",
+        crop_right="30",
+        crop_bottom="40",
+        image_url=IMAGE_URL,
+    )
+
+    assert url == f"1x2:3x4/{IMAGE_URL}"
+
+
+def test_options_passed_by_thumbor_url():
+    """Mirrors the dict thumbor.url_composer.get_thumbor_params builds."""
+    url = plain_image_url(
+        width=300,
+        height=200,
+        smart=False,
+        meta=False,
+        horizontal_flip=True,
+        vertical_flip=True,
+        halign="center",
+        valign="middle",
+        trim=False,
+        crop_left="10",
+        crop_top="20",
+        crop_right="110",
+        crop_bottom="220",
+        filters=None,
+        image_url=IMAGE_URL,
+        fit_in=False,
+        full_fit_in=False,
+        adaptive_fit_in=False,
+        adaptive_full_fit_in=False,
+    )
+
+    assert url == f"10x20:110x220/-300x-200/{IMAGE_URL}"
+
+
 def test_horizontal_alignment():
     """test_horizontal_alignment
     Given

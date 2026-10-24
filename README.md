@@ -171,10 +171,11 @@ The library supports the transformation pieces covered by the test suite and
 thumbor-compatible URL composer:
 
 - `width`, `height`
-- `crop=((left, top), (right, bottom))`
+- `crop=((left, top), (right, bottom))`, or `crop_left`, `crop_top`, `crop_right`,
+  `crop_bottom` as `thumbor-url` passes them
 - `fit_in`, `full_fit_in`
 - `adaptive_fit_in`, `adaptive_full_fit_in`
-- `flip`, `flop`
+- `flip`, `flop`, also accepted as `horizontal_flip` and `vertical_flip`
 - `halign` with `left`, `center`, `right`
 - `valign` with `top`, `middle`, `bottom`
 - `smart`
