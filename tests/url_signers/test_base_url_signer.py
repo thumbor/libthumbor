@@ -28,6 +28,10 @@ class BaseSignerTestCase(TestCase):
         assert isinstance(signer, BaseUrlSigner)
         assert signer.security_key == "téste".encode("utf-8")
 
+    def test_rejects_key_that_is_not_str_or_bytes(self):
+        with pytest.raises(TypeError, match="NoneType"):
+            BaseUrlSigner(security_key=None)
+
     def test_can_validate_url(self):
         class TestSigner(BaseUrlSigner):
             def signature(self, url):
