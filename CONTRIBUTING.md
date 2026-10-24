@@ -9,7 +9,7 @@ changes, and preparing a pull request.
 
 Fork the repository and clone your fork locally. If you need a refresher on
 that workflow, GitHub's fork documentation is a good place to start:
-<http://help.github.com/fork-a-repo/>.
+<https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo>.
 
 ## Dependencies
 
@@ -57,7 +57,7 @@ Before opening a pull request:
 If you want to track the upstream repository as an extra remote:
 
 ```bash
-git remote add libthumbor git://github.com/thumbor/libthumbor.git
+git remote add libthumbor https://github.com/thumbor/libthumbor.git
 ```
 
 To update your branch with upstream `master`:
