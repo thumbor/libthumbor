@@ -1,4 +1,4 @@
-test ci_test: unit coverage black flake8 isort-check pylint
+test ci_test: unit coverage black flake8 isort-check pylint mypy
 
 unit:
 	@uv run pytest --cov=libthumbor --cov-report= tests/
@@ -23,10 +23,13 @@ isort isort-check:
 pylint:
 	@uv run pylint libthumbor tests
 
+mypy:
+	@uv run mypy
+
 pre-commit-install:
 	@uv run pre-commit install
 
 pre-commit:
 	@uv run pre-commit run --all-files
 
-lint: black flake8 isort-check pylint
+lint: black flake8 isort-check pylint mypy
