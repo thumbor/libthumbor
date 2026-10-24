@@ -9,8 +9,6 @@
 
 from unittest import TestCase
 
-from preggy import expect
-
 from libthumbor import Signer
 from libthumbor.crypto import CryptoURL
 
@@ -21,7 +19,7 @@ KEY = b"my-security-key"
 class NewFormatUrlTestsMixin:
     def test_generated_url_1(self):
         url = self.crypto.generate(image_url=IMAGE_URL, width=300, height=200)
-        expect(url).to_equal(
+        assert url == (
             "/8ammJH8D-7tXy6kU3lTvoXlhu4o=/300x200/my.server.com/some/path/to/image.jpg"
         )
 
@@ -29,7 +27,7 @@ class NewFormatUrlTestsMixin:
         url = self.crypto.generate(
             image_url=IMAGE_URL, width=300, height=200, crop=((10, 10), (200, 200))
         )
-        expect(url).to_equal(
+        assert url == (
             "/B35oBEIwztbc3jm7vsdqLez2C78=/10x10:200x200/300x200/"
             "my.server.com/some/path/to/image.jpg"
         )
@@ -42,7 +40,7 @@ class NewFormatUrlTestsMixin:
             crop=((10, 10), (200, 200)),
             filters=("brightness(20)", "contrast(10)"),
         )
-        expect(url).to_equal(
+        assert url == (
             "/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/"
             "filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg"
         )
@@ -55,7 +53,7 @@ class NewFormatUrlTestsMixin:
             crop=((10, 10), (200, 200)),
             filters=("brightness(20)", "contrast(10)"),
         )
-        expect(url).to_equal(
+        assert url == (
             "/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/"
             "filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg"
         )
@@ -67,7 +65,7 @@ class NewFormatUrlTestsMixin:
             crop=((10, 10), (200, 200)),
             filters=("brightness(20)", "contrast(10)"),
         )
-        expect(url).to_equal(
+        assert url == (
             "/as8U2DbUUtTMgvPF26LkjS3MocY=/10x10:200x200/300x200/"
             "filters:brightness(20):contrast(10)/my.server.com/some/path/to/image.jpg"
         )
@@ -91,13 +89,13 @@ class GenerateWithUnsafeTestCase(TestCase):
         url = self.crypto.generate(
             image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=True
         )
-        expect(url.startswith("unsafe")).to_be_true()
+        assert url.startswith("unsafe")
 
     def test_should_not_get_an_unsafe_url_when_unsafe_is_false(self):
         url = self.crypto.generate(
             image_url=IMAGE_URL, crop=((10, 20), (30, 40)), unsafe=False
         )
-        expect(url.startswith("unsafe")).to_be_false()
+        assert not url.startswith("unsafe")
 
 
 class NonAsciiKeyTests(TestCase):
@@ -106,11 +104,11 @@ class NonAsciiKeyTests(TestCase):
         url = "300x200/" + IMAGE_URL
         generated = CryptoURL(key).generate(image_url=IMAGE_URL, width=300, height=200)
         expected = Signer(key).signature(url).decode("ascii")
-        expect(generated).to_equal(f"/{expected}/{url}")
+        assert generated == f"/{expected}/{url}"
 
     def test_non_ascii_image_url(self):
         key = "my-security-key"
         url = "example.com/日本.jpg"
         generated = CryptoURL(key).generate(image_url=url)
         expected = Signer(key).signature(url).decode("ascii")
-        expect(generated).to_equal(f"/{expected}/{url}")
+        assert generated == f"/{expected}/{url}"

@@ -10,7 +10,6 @@
 import os
 
 import pytest
-from preggy import expect
 
 from libthumbor.crypto import CryptoURL
 
@@ -35,6 +34,10 @@ HTTP_OK = 200
 HTTP_BAD_REQUEST = 400
 
 
+def body(response):
+    return response.content.decode()
+
+
 @pytest.mark.skip_if(not DJANGO_PRESENT, "django must be present to run this test")
 class GenericViewsTestCase(TestCase):
     def setUp(self):
@@ -44,18 +47,16 @@ class GenericViewsTestCase(TestCase):
         for query in ("", "?image_url=", "?image_url=%20%20"):
             response = self.client.get("/gen_url/" + query)
 
-            expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-            expect(response.content.decode("utf-8")).to_equal(
-                "Invalid thumbor URL parameters."
-            )
+            assert response.status_code == HTTP_BAD_REQUEST
+            assert body(response) == "Invalid thumbor URL parameters."
 
     def test_generate_url_with_params_via_post(self):
         image_args = {"image_url": "globo.com/media/img/my_image.jpg"}
 
         response = self.client.post("/gen_url/", image_args)
 
-        expect(response.status_code).to_equal(HTTP_METHOD_NOT_ALLOWED)
-        expect(response["Content-Type"]).to_equal("text/plain")
+        assert response.status_code == HTTP_METHOD_NOT_ALLOWED
+        assert response["Content-Type"] == "text/plain"
 
     def test_generate_url_with_params_via_get(self):
         crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
@@ -64,8 +65,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_OK)
-        expect(response.content).to_equal(
+        assert response.status_code == HTTP_OK
+        assert body(response) == (
             settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/")
         )
 
@@ -76,11 +77,9 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(response["Content-Type"]).to_equal("text/plain")
-        expect(response.content.decode("utf-8")).to_equal(
-            "The width value is not an integer."
-        )
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert response["Content-Type"] == "text/plain"
+        assert body(response) == "The width value is not an integer."
 
     def test_passing_invalid_value_for_height(self):
         self.url_query.update(
@@ -89,10 +88,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(response.content.decode("utf-8")).to_equal(
-            "The height value is not an integer."
-        )
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert body(response) == "The height value is not an integer."
 
     def test_passing_invalid_aligns(self):
         self.url_query.update(
@@ -101,10 +98,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(response.content.decode("utf-8")).to_equal(
-            "Invalid thumbor URL parameters."
-        )
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert body(response) == "Invalid thumbor URL parameters."
 
     def test_passing_only_one_crop_value(self):
         self.url_query.update(
@@ -113,8 +108,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(str(response.content)).to_include("Missing values for cropping")
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert "Missing values for cropping" in body(response)
 
     def test_passing_only_one_crop_with_invalid_value(self):
         self.url_query.update(
@@ -129,8 +124,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(str(response.content)).to_include("Invalid values for cropping")
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert "Invalid values for cropping" in body(response)
 
     def test_passing_various_erroneous_values(self):
         self.url_query.update(
@@ -144,7 +139,7 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
+        assert response.status_code == HTTP_BAD_REQUEST
 
     def test_passing_all_params(self):
         image_args = {
@@ -168,8 +163,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_OK)
-        expect(response.content).to_equal(
+        assert response.status_code == HTTP_OK
+        assert body(response) == (
             settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/")
         )
 
@@ -183,9 +178,9 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(response["Content-Type"]).to_equal("text/plain")
-        expect(response.content.decode("utf-8")).not_to_include("<script>")
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert response["Content-Type"] == "text/plain"
+        assert "<script>" not in body(response)
 
     def test_unsafe_parameter_is_ignored(self):
         crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
@@ -195,9 +190,9 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_OK)
-        expect(response.content.decode("utf-8")).not_to_include("unsafe")
-        expect(response.content).to_equal(
+        assert response.status_code == HTTP_OK
+        assert "unsafe" not in body(response)
+        assert body(response) == (
             settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/")
         )
 
@@ -213,11 +208,11 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_OK)
-        body = response.content.decode("utf-8")
-        expect(body).not_to_include("/smart/")
-        expect(body).not_to_include("/meta/")
-        expect(body).not_to_include("-0x")
+        assert response.status_code == HTTP_OK
+        url = body(response)
+        assert "/smart/" not in url
+        assert "/meta/" not in url
+        assert "-0x" not in url
 
     def test_invalid_flag_value(self):
         self.url_query.update(
@@ -226,10 +221,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(response.content.decode("utf-8")).to_equal(
-            "The trim value is not a boolean."
-        )
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert body(response) == "The trim value is not a boolean."
 
     def test_filters_are_split_on_colon(self):
         crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
@@ -243,8 +236,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_OK)
-        expect(response.content).to_equal(
+        assert response.status_code == HTTP_OK
+        assert body(response) == (
             settings.THUMBOR_SERVER + crypto.generate(**image_args).strip("/")
         )
 
@@ -261,10 +254,8 @@ class GenericViewsTestCase(TestCase):
 
         response = self.client.get("/gen_url/?" + self.url_query.urlencode())
 
-        expect(response.status_code).to_equal(HTTP_BAD_REQUEST)
-        expect(response.content.decode("utf-8")).to_include(
-            "Expected non-negative integers"
-        )
+        assert response.status_code == HTTP_BAD_REQUEST
+        assert "Expected non-negative integers" in body(response)
 
     def test_missing_security_key(self):
         with override_settings(THUMBOR_SECURITY_KEY=""):
@@ -277,8 +268,8 @@ class GenericViewsTestCase(TestCase):
                 "/gen_url/?image_url=globo.com/media/img/my_image.jpg"
             )
 
-        expect(response.status_code).to_equal(HTTP_OK)
-        expect(response.content.decode("utf-8")).to_include("https://img.example.com/")
+        assert response.status_code == HTTP_OK
+        assert body(response).startswith("https://img.example.com/")
 
     def test_thumbor_server_without_a_trailing_slash(self):
         crypto = CryptoURL(settings.THUMBOR_SECURITY_KEY)
@@ -287,7 +278,7 @@ class GenericViewsTestCase(TestCase):
         with override_settings(THUMBOR_SERVER="https://img.example.com"):
             response = self.client.get("/gen_url/?image_url=" + image_args["image_url"])
 
-        expect(response.status_code).to_equal(HTTP_OK)
-        expect(response.content.decode("utf-8")).to_equal(
+        assert response.status_code == HTTP_OK
+        assert body(response) == (
             "https://img.example.com/" + crypto.generate(**image_args).strip("/")
         )

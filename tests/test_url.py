@@ -9,8 +9,6 @@
 
 from unittest import TestCase
 
-from preggy import expect
-
 from libthumbor.url import Url
 
 
@@ -21,7 +19,7 @@ class UrlTestCase(TestCase):
     def test_can_get_regex(self):
         regex = Url.regex()
 
-        expect(regex).to_equal(
+        assert regex == (
             "/?(?:(?:(?P<unsafe>unsafe)|(?P<hash>.+?))/)?(?:(?P<debug>debug)/)?(?:(?P<meta>meta)/)?"
             "(?:(?P<trim>trim(?::(?:top-left|bottom-right))?(?::\\d+)?)/)?"
             "(?:(?P<crop_left>\\d+)x(?P<crop_top>\\d+):(?P<crop_right>\\d+)x(?P<crop_bottom>\\d+)/)?"
@@ -34,7 +32,7 @@ class UrlTestCase(TestCase):
     def test_can_get_regex_without_unsafe(self):
         regex = Url.regex(False)
 
-        expect(regex).to_equal(
+        assert regex == (
             "/?(?:(?P<debug>debug)/)?(?:(?P<meta>meta)/)?"
             "(?:(?P<trim>trim(?::(?:top-left|bottom-right))?(?::\\d+)?)/)?"
             "(?:(?P<crop_left>\\d+)x(?P<crop_top>\\d+):(?P<crop_right>\\d+)x(?P<crop_bottom>\\d+)/)?"
@@ -45,10 +43,10 @@ class UrlTestCase(TestCase):
         )
 
     def test_parsing_invalid_url(self):
-        expect(Url.compiled_regex).to_be_null()
+        assert Url.compiled_regex is None
 
         url = ""
-        expect(Url.parse_decrypted(url)).to_be_null()
+        assert Url.parse_decrypted(url) is None
 
     def test_parsing_complete_url(self):
         url = (
@@ -76,13 +74,13 @@ class UrlTestCase(TestCase):
         }
 
         result = Url.parse_decrypted(url)
-        expect(result).not_to_be_null()
-        expect(result).to_be_like(expected)
+        assert result is not None
+        assert result == expected
 
         # do it again to use compiled regex
         result = Url.parse_decrypted(url)
-        expect(result).not_to_be_null()
-        expect(result).to_be_like(expected)
+        assert result is not None
+        assert result == expected
 
     def test_can_generate_url(self):
         url = Url.generate_options(
@@ -106,19 +104,19 @@ class UrlTestCase(TestCase):
             filters="brightness(100)",
         )
 
-        expect(url).to_equal(
+        assert url == (
             "debug/meta/trim/100x100:400x400/adaptive-full-fit-in/-300x-200/left/top/smart/filters:brightness(100)"
         )
 
     def test_can_generate_url_with_defaults(self):
         url = Url.generate_options()
 
-        expect(url).to_be_empty()
+        assert url == ""
 
     def test_can_generate_url_with_fitin(self):
         url = Url.generate_options(fit_in=True, adaptive=False, full=False)
 
-        expect(url).to_equal("fit-in")
+        assert url == "fit-in"
 
     def test_can_generate_url_with_custom_trim(self):
         url = Url.generate_options(
@@ -142,12 +140,12 @@ class UrlTestCase(TestCase):
             filters="brightness(100)",
         )
 
-        expect(url).to_equal(
+        assert url == (
             "debug/meta/trim:300x200/100x100:400x400/adaptive-full-fit-in/-300x-200/left/top/smart/filters:brightness(100)"
         )
 
     def test_parse_decrypted_with_more_digits_than_int_accepts(self):
         too_long = "9" * 5000
 
-        expect(Url.parse_decrypted(f"{too_long}x10/image.jpg")).to_be_null()
-        expect(Url.parse_decrypted(f"1x1:{too_long}x1/image.jpg")).to_be_null()
+        assert Url.parse_decrypted(f"{too_long}x10/image.jpg") is None
+        assert Url.parse_decrypted(f"1x1:{too_long}x1/image.jpg") is None

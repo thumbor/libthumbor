@@ -27,7 +27,6 @@ dev = [
     "isort>=7,<10",
     "pre-commit>=4.5.1,<5",
     "pylint>=4.0.5,<5",
-    "preggy>=1.4.4,<2",
     "pytest-cov>=7.0.0,<8",
     "django>=5.2.12,<6",
     "coverage>=7.13.4,<8",
