@@ -16,6 +16,31 @@ import warnings
 AVAILABLE_HALIGN = ["left", "center", "right"]
 AVAILABLE_VALIGN = ["top", "middle", "bottom"]
 CROP_ALIASES = ("crop_left", "crop_top", "crop_right", "crop_bottom")
+KNOWN_OPTIONS = frozenset(
+    (
+        "image_url",
+        "unsafe",
+        "debug",
+        "meta",
+        "trim",
+        "crop",
+        *CROP_ALIASES,
+        "fit_in",
+        "full_fit_in",
+        "adaptive_fit_in",
+        "adaptive_full_fit_in",
+        "width",
+        "height",
+        "flip",
+        "flop",
+        "horizontal_flip",
+        "vertical_flip",
+        "halign",
+        "valign",
+        "smart",
+        "filters",
+    )
+)
 
 
 def _int_or_0(value):
