@@ -10,6 +10,7 @@
 import hashlib
 from unittest import TestCase, mock
 
+import pytest
 from preggy import expect
 
 from libthumbor.url import plain_image_url, unsafe_url, url_for
@@ -32,8 +33,16 @@ def test_no_options_specified():
     expect(url).to_equal(IMAGE_URL)
 
 
+def test_url_for_is_deprecated():
+    with pytest.warns(DeprecationWarning, match=r"url_for\(\) is deprecated") as record:
+        url_for(image_url=IMAGE_URL)
+
+    expect(record[0].filename).to_equal(__file__)
+
+
 def test_url_for_replaces_the_image_url_with_its_md5():
-    url = url_for(width=300, image_url=IMAGE_URL)
+    with pytest.warns(DeprecationWarning):
+        url = url_for(width=300, image_url=IMAGE_URL)
 
     expect(url).to_equal(f"300x0/{IMAGE_MD5}")
 
@@ -47,7 +56,10 @@ def test_url_for_marks_md5_as_not_used_for_security():
     Then
         The image URL is hashed with md5 and usedforsecurity=False
     """
-    with mock.patch("libthumbor.url.hashlib.md5", wraps=hashlib.md5) as md5:
+    with (
+        mock.patch("libthumbor.url.hashlib.md5", wraps=hashlib.md5) as md5,
+        pytest.warns(DeprecationWarning),
+    ):
         url_for(image_url=IMAGE_URL)
 
     expect(md5.call_args.kwargs).to_equal({"usedforsecurity": False})
@@ -614,6 +626,7 @@ class UnsafeUrlTestCase(TestCase):
 
 
 def test_url_for_with_non_ascii_image_url():
-    expect(url_for(image_url="example.com/日本.jpg")).to_equal(
-        "18f3625a70ea0a67ebc3d00a3fbb7cc9"
-    )
+    with pytest.warns(DeprecationWarning):
+        url = url_for(image_url="example.com/日本.jpg")
+
+    expect(url).to_equal("18f3625a70ea0a67ebc3d00a3fbb7cc9")
