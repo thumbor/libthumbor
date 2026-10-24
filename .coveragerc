@@ -11,7 +11,3 @@ exclude_lines =
     def __repr__
     raise NotImplementedError
     if __name__ == .__main__.:
-    from urllib.parse import parse_qs
-    except ImportError:
-    from nose_focus import focus
-    @focus
