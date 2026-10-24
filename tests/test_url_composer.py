@@ -12,7 +12,7 @@ from unittest import TestCase, mock
 
 from preggy import expect
 
-from libthumbor.url import unsafe_url, url_for
+from libthumbor.url import plain_image_url, unsafe_url, url_for
 
 IMAGE_URL = "my.server.com/some/path/to/image.jpg"
 IMAGE_MD5 = "84996242f65a4d864aceb125e1c4c5ba"
@@ -25,11 +25,17 @@ def test_no_options_specified():
     When
         I ask my library for an URL
     Then
-        I get "84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "<image URL>" as URL
     """
-    url = url_for(image_url=IMAGE_URL)
+    url = plain_image_url(image_url=IMAGE_URL)
 
-    expect(url).to_equal(IMAGE_MD5)
+    expect(url).to_equal(IMAGE_URL)
+
+
+def test_url_for_replaces_the_image_url_with_its_md5():
+    url = url_for(width=300, image_url=IMAGE_URL)
+
+    expect(url).to_equal(f"300x0/{IMAGE_MD5}")
 
 
 def test_url_for_marks_md5_as_not_used_for_security():
@@ -59,7 +65,7 @@ def test_url_raises_if_no_url():
     with expect.error_to_happen(
         ValueError, message="The image_url argument is mandatory."
     ):
-        url_for()
+        plain_image_url()
 
 
 def test_url_width_height_1():
@@ -70,11 +76,11 @@ def test_url_width_height_1():
     When
         I ask my library for an URL
     Then
-        I get "300x0/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "300x0/<image URL>" as URL
     """
-    url = url_for(width=300, image_url=IMAGE_URL)
+    url = plain_image_url(width=300, image_url=IMAGE_URL)
 
-    expect(url).to_equal("300x0/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"300x0/{IMAGE_URL}")
 
 
 def test_url_width_height_2():
@@ -85,11 +91,11 @@ def test_url_width_height_2():
     When
         I ask my library for an URL
     Then
-        I get "0x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "0x300/<image URL>" as URL
     """
-    url = url_for(height=300, image_url=IMAGE_URL)
+    url = plain_image_url(height=300, image_url=IMAGE_URL)
 
-    expect(url).to_equal("0x300/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"0x300/{IMAGE_URL}")
 
 
 def test_url_width_height_3():
@@ -101,11 +107,11 @@ def test_url_width_height_3():
     When
         I ask my library for an URL
     Then
-        I get "200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "200x300/<image URL>" as URL
     """
-    url = url_for(width=200, height=300, image_url=IMAGE_URL)
+    url = plain_image_url(width=200, height=300, image_url=IMAGE_URL)
 
-    expect(url).to_equal("200x300/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"200x300/{IMAGE_URL}")
 
 
 def test_url_width_height_4():
@@ -116,11 +122,11 @@ def test_url_width_height_4():
     When
         I ask my library for an URL
     Then
-        I get "origx0/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "origx0/<image URL>" as URL
     """
-    url = url_for(width="orig", image_url=IMAGE_URL)
+    url = plain_image_url(width="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal("origx0/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"origx0/{IMAGE_URL}")
 
 
 def test_url_width_height_5():
@@ -131,11 +137,11 @@ def test_url_width_height_5():
     When
         I ask my library for an URL
     Then
-        I get "0xorig/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "0xorig/<image URL>" as URL
     """
-    url = url_for(height="orig", image_url=IMAGE_URL)
+    url = plain_image_url(height="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal("0xorig/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"0xorig/{IMAGE_URL}")
 
 
 def test_url_width_height_6():
@@ -147,11 +153,11 @@ def test_url_width_height_6():
     When
         I ask my library for an URL
     Then
-        I get "100xorig/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "100xorig/<image URL>" as URL
     """
-    url = url_for(width=100, height="orig", image_url=IMAGE_URL)
+    url = plain_image_url(width=100, height="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal("100xorig/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"100xorig/{IMAGE_URL}")
 
 
 def test_url_width_height_7():
@@ -163,11 +169,11 @@ def test_url_width_height_7():
     When
         I ask my library for an URL
     Then
-        I get "origx100/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "origx100/<image URL>" as URL
     """
-    url = url_for(width="orig", height=100, image_url=IMAGE_URL)
+    url = plain_image_url(width="orig", height=100, image_url=IMAGE_URL)
 
-    expect(url).to_equal("origx100/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"origx100/{IMAGE_URL}")
 
 
 def test_url_width_height_8():
@@ -179,11 +185,11 @@ def test_url_width_height_8():
     When
         I ask my library for an URL
     Then
-        I get "origxorig/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "origxorig/<image URL>" as URL
     """
-    url = url_for(width="orig", height="orig", image_url=IMAGE_URL)
+    url = plain_image_url(width="orig", height="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal("origxorig/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"origxorig/{IMAGE_URL}")
 
 
 def test_smart_url():
@@ -196,11 +202,11 @@ def test_smart_url():
     When
         I ask my library for an URL
     Then
-        I get "200x300/smart/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "200x300/smart/<image URL>" as URL
     """
-    url = url_for(width=200, height=300, smart=True, image_url=IMAGE_URL)
+    url = plain_image_url(width=200, height=300, smart=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal("200x300/smart/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"200x300/smart/{IMAGE_URL}")
 
 
 def test_fit_in_url():
@@ -213,11 +219,11 @@ def test_fit_in_url():
     When
         I ask my library for an URL
     Then
-        I get "fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "fit-in/200x300/<image URL>" as URL
     """
-    url = url_for(width=200, height=300, fit_in=True, image_url=IMAGE_URL)
+    url = plain_image_url(width=200, height=300, fit_in=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal("fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"fit-in/200x300/{IMAGE_URL}")
 
 
 def test_adaptive_fit_in_url():
@@ -230,11 +236,13 @@ def test_adaptive_fit_in_url():
     When
         I ask my library for an URL
     Then
-        I get "adaptive-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "adaptive-fit-in/200x300/<image URL>" as URL
     """
-    url = url_for(width=200, height=300, adaptive_fit_in=True, image_url=IMAGE_URL)
+    url = plain_image_url(
+        width=200, height=300, adaptive_fit_in=True, image_url=IMAGE_URL
+    )
 
-    expect(url).to_equal("adaptive-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"adaptive-fit-in/200x300/{IMAGE_URL}")
 
 
 def test_fit_in_fails_if_no_width_supplied():
@@ -243,7 +251,7 @@ def test_fit_in_fails_if_no_width_supplied():
         message="When using fit-in or full-fit-in, "
         "you must specify width and/or height.",
     ):
-        url_for(fit_in=True, image_url=IMAGE_URL)
+        plain_image_url(fit_in=True, image_url=IMAGE_URL)
 
 
 def test_full_fit_in_fails_if_no_width_supplied():
@@ -252,7 +260,7 @@ def test_full_fit_in_fails_if_no_width_supplied():
         message="When using fit-in or full-fit-in, "
         "you must specify width and/or height.",
     ):
-        url_for(full_fit_in=True, image_url=IMAGE_URL)
+        plain_image_url(full_fit_in=True, image_url=IMAGE_URL)
 
 
 def test_adaptive_fit_in_fails_if_no_width_supplied():
@@ -261,7 +269,7 @@ def test_adaptive_fit_in_fails_if_no_width_supplied():
         message="When using fit-in or full-fit-in, "
         "you must specify width and/or height.",
     ):
-        url_for(adaptive_fit_in=True, image_url=IMAGE_URL)
+        plain_image_url(adaptive_fit_in=True, image_url=IMAGE_URL)
 
 
 def test_adaptive_full_fit_in_fails_if_no_width_supplied():
@@ -270,7 +278,7 @@ def test_adaptive_full_fit_in_fails_if_no_width_supplied():
         message="When using fit-in or full-fit-in, "
         "you must specify width and/or height.",
     ):
-        url_for(adaptive_full_fit_in=True, image_url=IMAGE_URL)
+        plain_image_url(adaptive_full_fit_in=True, image_url=IMAGE_URL)
 
 
 def test_full_fit_in_url():
@@ -283,11 +291,11 @@ def test_full_fit_in_url():
     When
         I ask my library for an URL
     Then
-        I get "full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "full-fit-in/200x300/<image URL>" as URL
     """
-    url = url_for(width=200, height=300, full_fit_in=True, image_url=IMAGE_URL)
+    url = plain_image_url(width=200, height=300, full_fit_in=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal("full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"full-fit-in/200x300/{IMAGE_URL}")
 
 
 def test_adaptive_full_fit_in_url():
@@ -300,13 +308,13 @@ def test_adaptive_full_fit_in_url():
     When
         I ask my library for an URL
     Then
-        I get "adaptive-full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "adaptive-full-fit-in/200x300/<image URL>" as URL
     """
-    url = url_for(width=200, height=300, adaptive_full_fit_in=True, image_url=IMAGE_URL)
-
-    expect(url).to_equal(
-        "adaptive-full-fit-in/200x300/84996242f65a4d864aceb125e1c4c5ba"
+    url = plain_image_url(
+        width=200, height=300, adaptive_full_fit_in=True, image_url=IMAGE_URL
     )
+
+    expect(url).to_equal(f"adaptive-full-fit-in/200x300/{IMAGE_URL}")
 
 
 def test_flip_1():
@@ -317,11 +325,11 @@ def test_flip_1():
     When
         I ask my library for an URL
     Then
-        I get "-0x0/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "-0x0/<image URL>" as URL
     """
-    url = url_for(flip=True, image_url=IMAGE_URL)
+    url = plain_image_url(flip=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal("-0x0/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"-0x0/{IMAGE_URL}")
 
 
 def test_flip_2():
@@ -333,11 +341,11 @@ def test_flip_2():
     When
         I ask my library for an URL
     Then
-        I get "-200x0/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "-200x0/<image URL>" as URL
     """
-    url = url_for(flip=True, width=200, image_url=IMAGE_URL)
+    url = plain_image_url(flip=True, width=200, image_url=IMAGE_URL)
 
-    expect(url).to_equal("-200x0/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"-200x0/{IMAGE_URL}")
 
 
 def test_flop_1():
@@ -348,11 +356,11 @@ def test_flop_1():
     When
         I ask my library for an URL
     Then
-        I get "0x-0/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "0x-0/<image URL>" as URL
     """
-    url = url_for(flop=True, image_url=IMAGE_URL)
+    url = plain_image_url(flop=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal("0x-0/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"0x-0/{IMAGE_URL}")
 
 
 def test_flop_2():
@@ -364,11 +372,11 @@ def test_flop_2():
     When
         I ask my library for an URL
     Then
-        I get "0x-200/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "0x-200/<image URL>" as URL
     """
-    url = url_for(flop=True, height=200, image_url=IMAGE_URL)
+    url = plain_image_url(flop=True, height=200, image_url=IMAGE_URL)
 
-    expect(url).to_equal("0x-200/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"0x-200/{IMAGE_URL}")
 
 
 def test_flip_flop():
@@ -380,11 +388,11 @@ def test_flip_flop():
     When
         I ask my library for an URL
     Then
-        I get "-0x-0/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "-0x-0/<image URL>" as URL
     """
-    url = url_for(flip=True, flop=True, image_url=IMAGE_URL)
+    url = plain_image_url(flip=True, flop=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal("-0x-0/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"-0x-0/{IMAGE_URL}")
 
 
 def test_flip_flop2():
@@ -398,11 +406,13 @@ def test_flip_flop2():
     When
         I ask my library for an URL
     Then
-        I get "-200x-300/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "-200x-300/<image URL>" as URL
     """
-    url = url_for(flip=True, flop=True, width=200, height=300, image_url=IMAGE_URL)
+    url = plain_image_url(
+        flip=True, flop=True, width=200, height=300, image_url=IMAGE_URL
+    )
 
-    expect(url).to_equal("-200x-300/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"-200x-300/{IMAGE_URL}")
 
 
 def test_horizontal_alignment():
@@ -413,11 +423,11 @@ def test_horizontal_alignment():
     When
         I ask my library for an URL
     Then
-        I get "left/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "left/<image URL>" as URL
     """
-    url = url_for(halign="left", image_url=IMAGE_URL)
+    url = plain_image_url(halign="left", image_url=IMAGE_URL)
 
-    expect(url).to_equal("left/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"left/{IMAGE_URL}")
 
 
 def test_horizontal_alignment2():
@@ -428,11 +438,11 @@ def test_horizontal_alignment2():
     When
         I ask my library for an URL
     Then
-        I get "84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "<image URL>" as URL
     """
-    url = url_for(halign="center", image_url=IMAGE_URL)
+    url = plain_image_url(halign="center", image_url=IMAGE_URL)
 
-    expect(url).to_equal("84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(IMAGE_URL)
 
 
 def test_vertical_alignment():
@@ -443,11 +453,11 @@ def test_vertical_alignment():
     When
         I ask my library for an URL
     Then
-        I get "top/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "top/<image URL>" as URL
     """
-    url = url_for(valign="top", image_url=IMAGE_URL)
+    url = plain_image_url(valign="top", image_url=IMAGE_URL)
 
-    expect(url).to_equal("top/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"top/{IMAGE_URL}")
 
 
 def test_vertical_alignment2():
@@ -458,11 +468,11 @@ def test_vertical_alignment2():
     When
         I ask my library for an URL
     Then
-        I get "84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "<image URL>" as URL
     """
-    url = url_for(valign="middle", image_url=IMAGE_URL)
+    url = plain_image_url(valign="middle", image_url=IMAGE_URL)
 
-    expect(url).to_equal("84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(IMAGE_URL)
 
 
 def test_both_alignments():
@@ -474,11 +484,11 @@ def test_both_alignments():
     When
         I ask my library for an URL
     Then
-        I get "left/top/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "left/top/<image URL>" as URL
     """
-    url = url_for(halign="left", valign="top", image_url=IMAGE_URL)
+    url = plain_image_url(halign="left", valign="top", image_url=IMAGE_URL)
 
-    expect(url).to_equal("left/top/84996242f65a4d864aceb125e1c4c5ba")
+    expect(url).to_equal(f"left/top/{IMAGE_URL}")
 
 
 def test_proper_haligns():
@@ -490,7 +500,7 @@ def test_proper_haligns():
             " are valid values for horizontal alignment."
         ),
     ):
-        url_for(halign="wrong", image_url=IMAGE_URL)
+        plain_image_url(halign="wrong", image_url=IMAGE_URL)
 
 
 def test_proper_valigns():
@@ -502,7 +512,7 @@ def test_proper_valigns():
             " are valid values for vertical alignment."
         ),
     ):
-        url_for(valign="wrong", image_url=IMAGE_URL)
+        plain_image_url(valign="wrong", image_url=IMAGE_URL)
 
 
 def test_proper_meta():
@@ -513,31 +523,31 @@ def test_proper_meta():
     When
         I ask my library for an URL
     Then
-        I get "meta/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "meta/<image URL>" as URL
     """
-    url = url_for(meta=True, image_url=IMAGE_URL)
+    url = plain_image_url(meta=True, image_url=IMAGE_URL)
 
-    expect("meta/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    expect(f"meta/{IMAGE_URL}").to_equal(url)
 
 
 def test_trim_standard():
-    url = url_for(trim=True, image_url=IMAGE_URL)
-    expect("trim/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    url = plain_image_url(trim=True, image_url=IMAGE_URL)
+    expect(f"trim/{IMAGE_URL}").to_equal(url)
 
 
 def test_trim_pixel_and_tolerance():
-    url = url_for(trim=("bottom-right", 15), image_url=IMAGE_URL)
-    expect("trim:bottom-right:15/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    url = plain_image_url(trim=("bottom-right", 15), image_url=IMAGE_URL)
+    expect(f"trim:bottom-right:15/{IMAGE_URL}").to_equal(url)
 
 
 def test_trim_pixel_only():
-    url = url_for(trim=("top-left", None), image_url=IMAGE_URL)
-    expect("trim:top-left/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    url = plain_image_url(trim=("top-left", None), image_url=IMAGE_URL)
+    expect(f"trim:top-left/{IMAGE_URL}").to_equal(url)
 
 
 def test_trim_tolerance_only():
-    url = url_for(trim=(None, 15), image_url=IMAGE_URL)
-    expect("trim::15/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    url = plain_image_url(trim=(None, 15), image_url=IMAGE_URL)
+    expect(f"trim::15/{IMAGE_URL}").to_equal(url)
 
 
 def test_manual_crop_1():
@@ -549,11 +559,11 @@ def test_manual_crop_1():
     When
         I ask my library for an URL
     Then
-        I get "10x20:30x40/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "10x20:30x40/<image URL>" as URL
     """
-    url = url_for(crop=((10, 20), (30, 40)), image_url=IMAGE_URL)
+    url = plain_image_url(crop=((10, 20), (30, 40)), image_url=IMAGE_URL)
 
-    expect("10x20:30x40/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    expect(f"10x20:30x40/{IMAGE_URL}").to_equal(url)
 
 
 def test_manual_crop_2():
@@ -565,11 +575,11 @@ def test_manual_crop_2():
     When
         I ask my library for an URL
     Then
-        I get "84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "<image URL>" as URL
     """
-    url = url_for(crop=((0, 0), (0, 0)), image_url=IMAGE_URL)
+    url = plain_image_url(crop=((0, 0), (0, 0)), image_url=IMAGE_URL)
 
-    expect("84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    expect(IMAGE_URL).to_equal(url)
 
 
 def test_smart_after_alignments():
@@ -581,11 +591,11 @@ def test_smart_after_alignments():
     When
         I ask my library for an URL
     Then
-        I get "left/smart/84996242f65a4d864aceb125e1c4c5ba" as URL
+        I get "left/smart/<image URL>" as URL
     """
-    url = url_for(smart=True, halign="left", image_url=IMAGE_URL)
+    url = plain_image_url(smart=True, halign="left", image_url=IMAGE_URL)
 
-    expect("left/smart/84996242f65a4d864aceb125e1c4c5ba").to_equal(url)
+    expect(f"left/smart/{IMAGE_URL}").to_equal(url)
 
 
 class UnsafeUrlTestCase(TestCase):
