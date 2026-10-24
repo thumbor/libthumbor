@@ -9,7 +9,7 @@
 
 import warnings
 
-from libthumbor.url import KNOWN_OPTIONS, plain_image_url, unsafe_url
+from libthumbor.url import KNOWN_OPTIONS, plain_image_url, read_flag, unsafe_url
 from libthumbor.url_signers.base64_hmac_sha1 import UrlSigner
 
 
@@ -43,7 +43,7 @@ class CryptoURL:
                 stacklevel=2,
             )
 
-        if options.get("unsafe", False):
+        if read_flag(options, "unsafe"):
             return unsafe_url(**options)
 
         return self.generate_new(options)

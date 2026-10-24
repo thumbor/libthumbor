@@ -100,6 +100,10 @@ class GenerateWithUnsafeTestCase(TestCase):
         )
         assert not url.startswith("unsafe")
 
+    def test_should_not_get_an_unsafe_url_when_unsafe_is_the_string_false(self):
+        url = self.crypto.generate(image_url=IMAGE_URL, unsafe="false")
+        assert url == self.crypto.generate(image_url=IMAGE_URL)
+
 
 class NonAsciiKeyTests(TestCase):
     def test_invalid_key_fails_on_construction(self):

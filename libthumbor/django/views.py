@@ -15,6 +15,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAll
 from django.utils.module_loading import import_string
 
 from libthumbor.crypto import CryptoURL
+from libthumbor.url import read_flag
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +36,6 @@ FLAG_PARAMS = (
     "adaptive_fit_in",
     "adaptive_full_fit_in",
 )
-TRUE_VALUES = frozenset(("1", "true", "yes", "on"))
-FALSE_VALUES = frozenset(("0", "false", "no", "off", ""))
 
 
 class InvalidParameter(ValueError):
@@ -89,12 +88,10 @@ def parse_integer(name, value):
 
 
 def parse_flag(name, value):
-    normalized = value.strip().lower()
-    if normalized in TRUE_VALUES:
-        return True
-    if normalized in FALSE_VALUES:
-        return False
-    raise InvalidParameter(f"The {name} value is not a boolean.")
+    try:
+        return read_flag({name: value}, name)
+    except ValueError as error:
+        raise InvalidParameter(f"The {name} value is not a boolean.") from error
 
 
 def parse_crop(query):
