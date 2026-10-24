@@ -421,6 +421,12 @@ def test_flip_flop_with_string_dimensions():
     assert url == f"-300x-orig/{IMAGE_URL}"
 
 
+def test_a_negative_dimension_means_flipped():
+    assert plain_image_url(width=-300, image_url=IMAGE_URL) == f"-300x0/{IMAGE_URL}"
+    url = plain_image_url(width=-300, flip=True, image_url=IMAGE_URL)
+    assert url == f"300x0/{IMAGE_URL}"
+
+
 def test_horizontal_and_vertical_flip_are_aliases_of_flip_and_flop():
     url = plain_image_url(
         horizontal_flip=True, vertical_flip=True, width=300, image_url=IMAGE_URL
