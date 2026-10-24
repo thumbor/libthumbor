@@ -8,6 +8,8 @@
 """Encrypted URLs for thumbor encryption."""
 
 import warnings
+from collections.abc import Mapping
+from typing import Any
 
 from libthumbor.url import KNOWN_OPTIONS, plain_image_url, read_flag, unsafe_url
 from libthumbor.url_signers.base64_hmac_sha1 import UrlSigner
@@ -16,7 +18,7 @@ from libthumbor.url_signers.base64_hmac_sha1 import UrlSigner
 class CryptoURL:
     """Class responsible for generating encrypted URLs for thumbor"""
 
-    def __init__(self, key):
+    def __init__(self, key: str | bytes) -> None:
         """
         Initializes the encryptor with the proper key
         :param key: secret key to use for hashing.
@@ -25,13 +27,13 @@ class CryptoURL:
         self.signer = UrlSigner(key)
         self.key = self.signer.security_key
 
-    def generate_new(self, options):
+    def generate_new(self, options: Mapping[str, Any]) -> str:
         url = plain_image_url(**options)
         signature = self.signer.signature(url).decode("ascii")
 
         return f"/{signature}/{url}"
 
-    def generate(self, **options):
+    def generate(self, **options: Any) -> str:
         """Generates an encrypted URL with the specified options"""
 
         unknown = sorted(options.keys() - KNOWN_OPTIONS)
