@@ -153,6 +153,24 @@ def _filters_segment(filters):
     return ":".join(["filters", *filters])
 
 
+def _alignment_segments(halign, valign):
+    if halign not in AVAILABLE_HALIGN:
+        raise ValueError(
+            'Only "left", "center" and "right" are'
+            + " valid values for horizontal alignment."
+        )
+    if valign not in AVAILABLE_VALIGN:
+        raise ValueError(
+            'Only "top", "middle" and "bottom" are'
+            + " valid values for vertical alignment."
+        )
+    return [
+        segment
+        for segment, default in ((halign, "center"), (valign, "middle"))
+        if segment != default
+    ]
+
+
 def url_for(**options):
     """Returns the options path with the image URL replaced by its MD5.
 
@@ -223,24 +241,11 @@ def get_url_parts(**options):
     calculate_fit_in(options, url_parts)
     calculate_width_and_height(url_parts, options)
 
-    halign = options.get("halign", "center")
-    valign = options.get("valign", "middle")
-
-    if halign not in AVAILABLE_HALIGN:
-        raise ValueError(
-            'Only "left", "center" and "right" are'
-            + " valid values for horizontal alignment."
+    url_parts.extend(
+        _alignment_segments(
+            options.get("halign", "center"), options.get("valign", "middle")
         )
-    if valign not in AVAILABLE_VALIGN:
-        raise ValueError(
-            'Only "top", "middle" and "bottom" are'
-            + " valid values for vertical alignment."
-        )
-
-    if halign != "center":
-        url_parts.append(halign)
-    if valign != "middle":
-        url_parts.append(valign)
+    )
 
     if read_flag(options, "smart"):
         url_parts.append("smart")
@@ -384,16 +389,17 @@ class Url:
         if meta:
             url.append("meta")
 
-        if trim:
-            if isinstance(trim, bool):
-                url.append("trim")
-            else:
-                url.append(f"trim:{trim}")
+        for segment in (
+            _trim_segment(trim),
+            _crop_segment(
+                ((crop_left or 0, crop_top or 0), (crop_right or 0, crop_bottom or 0))
+            ),
+        ):
+            if segment:
+                url.append(segment)
 
-        crop = crop_left or crop_top or crop_right or crop_bottom
-        if crop:
-            url.append(f"{crop_left}x{crop_top}:{crop_right}x{crop_bottom}")
-
+        if (adaptive or full) and not fit_in:
+            raise ValueError("The adaptive and full options require fit_in.")
         if fit_in:
             fit_ops = []
             if adaptive:
@@ -411,15 +417,13 @@ class Url:
         if width or height:
             url.append(f"{width}x{height}")
 
-        if halign != "center":
-            url.append(halign)
-        if valign != "middle":
-            url.append(valign)
+        url.extend(_alignment_segments(halign, valign))
 
         if smart:
             url.append("smart")
 
+        filters = _filters_segment(filters)
         if filters:
-            url.append(f"filters:{filters}")
+            url.append(filters)
 
         return "/".join(url)
