@@ -11,7 +11,6 @@ import hashlib
 from unittest import TestCase, mock
 
 import pytest
-from preggy import expect
 
 from libthumbor.url import plain_image_url, unsafe_url, url_for
 
@@ -30,21 +29,21 @@ def test_no_options_specified():
     """
     url = plain_image_url(image_url=IMAGE_URL)
 
-    expect(url).to_equal(IMAGE_URL)
+    assert url == IMAGE_URL
 
 
 def test_url_for_is_deprecated():
     with pytest.warns(DeprecationWarning, match=r"url_for\(\) is deprecated") as record:
         url_for(image_url=IMAGE_URL)
 
-    expect(record[0].filename).to_equal(__file__)
+    assert record[0].filename == __file__
 
 
 def test_url_for_replaces_the_image_url_with_its_md5():
     with pytest.warns(DeprecationWarning):
         url = url_for(width=300, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"300x0/{IMAGE_MD5}")
+    assert url == f"300x0/{IMAGE_MD5}"
 
 
 def test_url_for_marks_md5_as_not_used_for_security():
@@ -62,7 +61,7 @@ def test_url_for_marks_md5_as_not_used_for_security():
     ):
         url_for(image_url=IMAGE_URL)
 
-    expect(md5.call_args.kwargs).to_equal({"usedforsecurity": False})
+    assert md5.call_args.kwargs == {"usedforsecurity": False}
 
 
 def test_url_raises_if_no_url():
@@ -74,10 +73,9 @@ def test_url_raises_if_no_url():
     Then
         I get an exception that says image URL is mandatory
     """
-    with expect.error_to_happen(
-        ValueError, message="The image_url argument is mandatory."
-    ):
+    with pytest.raises(ValueError) as excinfo:
         plain_image_url()
+    assert str(excinfo.value) == "The image_url argument is mandatory."
 
 
 def test_url_width_height_1():
@@ -92,7 +90,7 @@ def test_url_width_height_1():
     """
     url = plain_image_url(width=300, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"300x0/{IMAGE_URL}")
+    assert url == f"300x0/{IMAGE_URL}"
 
 
 def test_url_width_height_2():
@@ -107,7 +105,7 @@ def test_url_width_height_2():
     """
     url = plain_image_url(height=300, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"0x300/{IMAGE_URL}")
+    assert url == f"0x300/{IMAGE_URL}"
 
 
 def test_url_width_height_3():
@@ -123,7 +121,7 @@ def test_url_width_height_3():
     """
     url = plain_image_url(width=200, height=300, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"200x300/{IMAGE_URL}")
+    assert url == f"200x300/{IMAGE_URL}"
 
 
 def test_url_width_height_4():
@@ -138,7 +136,7 @@ def test_url_width_height_4():
     """
     url = plain_image_url(width="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"origx0/{IMAGE_URL}")
+    assert url == f"origx0/{IMAGE_URL}"
 
 
 def test_url_width_height_5():
@@ -153,7 +151,7 @@ def test_url_width_height_5():
     """
     url = plain_image_url(height="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"0xorig/{IMAGE_URL}")
+    assert url == f"0xorig/{IMAGE_URL}"
 
 
 def test_url_width_height_6():
@@ -169,7 +167,7 @@ def test_url_width_height_6():
     """
     url = plain_image_url(width=100, height="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"100xorig/{IMAGE_URL}")
+    assert url == f"100xorig/{IMAGE_URL}"
 
 
 def test_url_width_height_7():
@@ -185,7 +183,7 @@ def test_url_width_height_7():
     """
     url = plain_image_url(width="orig", height=100, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"origx100/{IMAGE_URL}")
+    assert url == f"origx100/{IMAGE_URL}"
 
 
 def test_url_width_height_8():
@@ -201,7 +199,7 @@ def test_url_width_height_8():
     """
     url = plain_image_url(width="orig", height="orig", image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"origxorig/{IMAGE_URL}")
+    assert url == f"origxorig/{IMAGE_URL}"
 
 
 def test_smart_url():
@@ -218,7 +216,7 @@ def test_smart_url():
     """
     url = plain_image_url(width=200, height=300, smart=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"200x300/smart/{IMAGE_URL}")
+    assert url == f"200x300/smart/{IMAGE_URL}"
 
 
 def test_fit_in_url():
@@ -235,7 +233,7 @@ def test_fit_in_url():
     """
     url = plain_image_url(width=200, height=300, fit_in=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"fit-in/200x300/{IMAGE_URL}")
+    assert url == f"fit-in/200x300/{IMAGE_URL}"
 
 
 def test_adaptive_fit_in_url():
@@ -254,43 +252,18 @@ def test_adaptive_fit_in_url():
         width=200, height=300, adaptive_fit_in=True, image_url=IMAGE_URL
     )
 
-    expect(url).to_equal(f"adaptive-fit-in/200x300/{IMAGE_URL}")
+    assert url == f"adaptive-fit-in/200x300/{IMAGE_URL}"
 
 
-def test_fit_in_fails_if_no_width_supplied():
-    with expect.error_to_happen(
-        ValueError,
-        message="When using fit-in or full-fit-in, "
-        "you must specify width and/or height.",
-    ):
-        plain_image_url(fit_in=True, image_url=IMAGE_URL)
-
-
-def test_full_fit_in_fails_if_no_width_supplied():
-    with expect.error_to_happen(
-        ValueError,
-        message="When using fit-in or full-fit-in, "
-        "you must specify width and/or height.",
-    ):
-        plain_image_url(full_fit_in=True, image_url=IMAGE_URL)
-
-
-def test_adaptive_fit_in_fails_if_no_width_supplied():
-    with expect.error_to_happen(
-        ValueError,
-        message="When using fit-in or full-fit-in, "
-        "you must specify width and/or height.",
-    ):
-        plain_image_url(adaptive_fit_in=True, image_url=IMAGE_URL)
-
-
-def test_adaptive_full_fit_in_fails_if_no_width_supplied():
-    with expect.error_to_happen(
-        ValueError,
-        message="When using fit-in or full-fit-in, "
-        "you must specify width and/or height.",
-    ):
-        plain_image_url(adaptive_full_fit_in=True, image_url=IMAGE_URL)
+@pytest.mark.parametrize(
+    "option", ["fit_in", "full_fit_in", "adaptive_fit_in", "adaptive_full_fit_in"]
+)
+def test_fit_in_fails_if_no_width_supplied(option):
+    with pytest.raises(ValueError) as excinfo:
+        plain_image_url(image_url=IMAGE_URL, **{option: True})
+    assert str(excinfo.value) == (
+        "When using fit-in or full-fit-in, you must specify width and/or height."
+    )
 
 
 def test_full_fit_in_url():
@@ -307,7 +280,7 @@ def test_full_fit_in_url():
     """
     url = plain_image_url(width=200, height=300, full_fit_in=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"full-fit-in/200x300/{IMAGE_URL}")
+    assert url == f"full-fit-in/200x300/{IMAGE_URL}"
 
 
 def test_adaptive_full_fit_in_url():
@@ -326,7 +299,7 @@ def test_adaptive_full_fit_in_url():
         width=200, height=300, adaptive_full_fit_in=True, image_url=IMAGE_URL
     )
 
-    expect(url).to_equal(f"adaptive-full-fit-in/200x300/{IMAGE_URL}")
+    assert url == f"adaptive-full-fit-in/200x300/{IMAGE_URL}"
 
 
 def test_flip_1():
@@ -341,7 +314,7 @@ def test_flip_1():
     """
     url = plain_image_url(flip=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"-0x0/{IMAGE_URL}")
+    assert url == f"-0x0/{IMAGE_URL}"
 
 
 def test_flip_2():
@@ -357,7 +330,7 @@ def test_flip_2():
     """
     url = plain_image_url(flip=True, width=200, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"-200x0/{IMAGE_URL}")
+    assert url == f"-200x0/{IMAGE_URL}"
 
 
 def test_flop_1():
@@ -372,7 +345,7 @@ def test_flop_1():
     """
     url = plain_image_url(flop=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"0x-0/{IMAGE_URL}")
+    assert url == f"0x-0/{IMAGE_URL}"
 
 
 def test_flop_2():
@@ -388,7 +361,7 @@ def test_flop_2():
     """
     url = plain_image_url(flop=True, height=200, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"0x-200/{IMAGE_URL}")
+    assert url == f"0x-200/{IMAGE_URL}"
 
 
 def test_flip_flop():
@@ -404,7 +377,7 @@ def test_flip_flop():
     """
     url = plain_image_url(flip=True, flop=True, image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"-0x-0/{IMAGE_URL}")
+    assert url == f"-0x-0/{IMAGE_URL}"
 
 
 def test_flip_flop2():
@@ -424,7 +397,7 @@ def test_flip_flop2():
         flip=True, flop=True, width=200, height=300, image_url=IMAGE_URL
     )
 
-    expect(url).to_equal(f"-200x-300/{IMAGE_URL}")
+    assert url == f"-200x-300/{IMAGE_URL}"
 
 
 def test_horizontal_alignment():
@@ -439,7 +412,7 @@ def test_horizontal_alignment():
     """
     url = plain_image_url(halign="left", image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"left/{IMAGE_URL}")
+    assert url == f"left/{IMAGE_URL}"
 
 
 def test_horizontal_alignment2():
@@ -454,7 +427,7 @@ def test_horizontal_alignment2():
     """
     url = plain_image_url(halign="center", image_url=IMAGE_URL)
 
-    expect(url).to_equal(IMAGE_URL)
+    assert url == IMAGE_URL
 
 
 def test_vertical_alignment():
@@ -469,7 +442,7 @@ def test_vertical_alignment():
     """
     url = plain_image_url(valign="top", image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"top/{IMAGE_URL}")
+    assert url == f"top/{IMAGE_URL}"
 
 
 def test_vertical_alignment2():
@@ -484,7 +457,7 @@ def test_vertical_alignment2():
     """
     url = plain_image_url(valign="middle", image_url=IMAGE_URL)
 
-    expect(url).to_equal(IMAGE_URL)
+    assert url == IMAGE_URL
 
 
 def test_both_alignments():
@@ -500,31 +473,25 @@ def test_both_alignments():
     """
     url = plain_image_url(halign="left", valign="top", image_url=IMAGE_URL)
 
-    expect(url).to_equal(f"left/top/{IMAGE_URL}")
+    assert url == f"left/top/{IMAGE_URL}"
 
 
 def test_proper_haligns():
     """test_proper_haligns"""
-    with expect.error_to_happen(
-        ValueError,
-        message=(
-            'Only "left", "center" and "right"'
-            " are valid values for horizontal alignment."
-        ),
-    ):
+    with pytest.raises(ValueError) as excinfo:
         plain_image_url(halign="wrong", image_url=IMAGE_URL)
+    assert str(excinfo.value) == (
+        'Only "left", "center" and "right" are valid values for horizontal alignment.'
+    )
 
 
 def test_proper_valigns():
     """test_proper_haligns"""
-    with expect.error_to_happen(
-        ValueError,
-        message=(
-            'Only "top", "middle" and "bottom"'
-            " are valid values for vertical alignment."
-        ),
-    ):
+    with pytest.raises(ValueError) as excinfo:
         plain_image_url(valign="wrong", image_url=IMAGE_URL)
+    assert str(excinfo.value) == (
+        'Only "top", "middle" and "bottom" are valid values for vertical alignment.'
+    )
 
 
 def test_proper_meta():
@@ -539,27 +506,27 @@ def test_proper_meta():
     """
     url = plain_image_url(meta=True, image_url=IMAGE_URL)
 
-    expect(f"meta/{IMAGE_URL}").to_equal(url)
+    assert url == f"meta/{IMAGE_URL}"
 
 
 def test_trim_standard():
     url = plain_image_url(trim=True, image_url=IMAGE_URL)
-    expect(f"trim/{IMAGE_URL}").to_equal(url)
+    assert url == f"trim/{IMAGE_URL}"
 
 
 def test_trim_pixel_and_tolerance():
     url = plain_image_url(trim=("bottom-right", 15), image_url=IMAGE_URL)
-    expect(f"trim:bottom-right:15/{IMAGE_URL}").to_equal(url)
+    assert url == f"trim:bottom-right:15/{IMAGE_URL}"
 
 
 def test_trim_pixel_only():
     url = plain_image_url(trim=("top-left", None), image_url=IMAGE_URL)
-    expect(f"trim:top-left/{IMAGE_URL}").to_equal(url)
+    assert url == f"trim:top-left/{IMAGE_URL}"
 
 
 def test_trim_tolerance_only():
     url = plain_image_url(trim=(None, 15), image_url=IMAGE_URL)
-    expect(f"trim::15/{IMAGE_URL}").to_equal(url)
+    assert url == f"trim::15/{IMAGE_URL}"
 
 
 def test_manual_crop_1():
@@ -575,7 +542,7 @@ def test_manual_crop_1():
     """
     url = plain_image_url(crop=((10, 20), (30, 40)), image_url=IMAGE_URL)
 
-    expect(f"10x20:30x40/{IMAGE_URL}").to_equal(url)
+    assert url == f"10x20:30x40/{IMAGE_URL}"
 
 
 def test_manual_crop_2():
@@ -591,7 +558,7 @@ def test_manual_crop_2():
     """
     url = plain_image_url(crop=((0, 0), (0, 0)), image_url=IMAGE_URL)
 
-    expect(IMAGE_URL).to_equal(url)
+    assert url == IMAGE_URL
 
 
 def test_smart_after_alignments():
@@ -607,21 +574,23 @@ def test_smart_after_alignments():
     """
     url = plain_image_url(smart=True, halign="left", image_url=IMAGE_URL)
 
-    expect(f"left/smart/{IMAGE_URL}").to_equal(url)
+    assert url == f"left/smart/{IMAGE_URL}"
 
 
 class UnsafeUrlTestCase(TestCase):
     def test_should_return_a_valid_unsafe_url_with_no_params(self):
-        expect(f"unsafe/{IMAGE_URL}").to_equal(unsafe_url(image_url=IMAGE_URL))
+        assert unsafe_url(image_url=IMAGE_URL) == f"unsafe/{IMAGE_URL}"
 
     def test_should_return_an_unsafe_url_with_width_and_height(self):
-        expect(f"unsafe/100x140/{IMAGE_URL}").to_equal(
-            unsafe_url(image_url=IMAGE_URL, width=100, height=140),
+        assert (
+            unsafe_url(image_url=IMAGE_URL, width=100, height=140)
+            == f"unsafe/100x140/{IMAGE_URL}"
         )
 
     def test_should_return_an_unsafe_url_with_crop_and_smart(self):
-        expect(f"unsafe/100x140/smart/{IMAGE_URL}").to_equal(
-            unsafe_url(image_url=IMAGE_URL, width=100, height=140, smart=True),
+        assert (
+            unsafe_url(image_url=IMAGE_URL, width=100, height=140, smart=True)
+            == f"unsafe/100x140/smart/{IMAGE_URL}"
         )
 
 
@@ -629,4 +598,4 @@ def test_url_for_with_non_ascii_image_url():
     with pytest.warns(DeprecationWarning):
         url = url_for(image_url="example.com/日本.jpg")
 
-    expect(url).to_equal("18f3625a70ea0a67ebc3d00a3fbb7cc9")
+    assert url == "18f3625a70ea0a67ebc3d00a3fbb7cc9"
