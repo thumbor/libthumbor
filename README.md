@@ -245,6 +245,44 @@ irrelevant for those callers. Put it behind authentication and restrict the
 origins thumbor is allowed to load (`ALLOWED_SOURCES`) before exposing it.
 The view raises `ImproperlyConfigured` when `THUMBOR_SECURITY_KEY` is unset.
 
+To restrict what the view signs, point `THUMBOR_URL_VALIDATOR` at a callable
+or at its dotted path. It runs after the query string is parsed and before
+signing, and receives the request and the parsed options. Raising
+`InvalidParameter` answers 400 with its message, which must not echo the
+submitted values, and raising `PermissionDenied` answers 403. Any other
+exception propagates as a 500, so guard calls that can fail on user input.
+Because the query string is parsed first, a malformed parameter answers 400
+even when the validator would deny the request; wrap the view with
+`login_required` when that distinction matters:
+
+```python
+from urllib.parse import urlsplit
+
+from django.core.exceptions import PermissionDenied
+
+from libthumbor.django.views import InvalidParameter
+
+
+def validate_thumbor_url(request, options):
+    if not request.user.is_authenticated:
+        raise PermissionDenied
+    image_url = options.get("image_url", "")
+    if "://" not in image_url:
+        image_url = f"http://{image_url}"
+    try:
+        hostname = urlsplit(image_url).hostname
+    except ValueError:
+        hostname = None
+    if hostname != "images.example.com":
+        raise InvalidParameter("Images must come from images.example.com.")
+    if options.get("filters"):
+        raise InvalidParameter("Filters are not allowed.")
+```
+
+```python
+THUMBOR_URL_VALIDATOR = "myproject.thumbor.validate_thumbor_url"
+```
+
 ## Development
 
 Install dependencies:
