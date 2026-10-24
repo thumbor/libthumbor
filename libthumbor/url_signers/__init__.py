@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # thumbor imaging service
 # https://github.com/thumbor/thumbor/wiki
 

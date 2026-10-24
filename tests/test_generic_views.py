@@ -1,8 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # libthumbor - python extension to thumbor
-# http://github.com/heynemann/libthumbor
+# https://github.com/thumbor/libthumbor
 
 # Licensed under the MIT license:
 # http://www.opensource.org/licenses/mit-license
