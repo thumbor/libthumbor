@@ -99,6 +99,9 @@ def get_url_parts(**options):
     options = _resolve_aliases(options)
     url_parts = []
 
+    if options.get("debug", False):
+        url_parts.append("debug")
+
     if options.get("meta", False):
         url_parts.append("meta")
 
