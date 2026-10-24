@@ -21,26 +21,22 @@ def _int_or_0(value):
     return 0 if value is None else int(value)
 
 
+def _flipped(dimension):
+    # Negating 0 or a string such as "300" or "orig" would drop the sign.
+    if isinstance(dimension, (int, float)) and dimension:
+        return -dimension
+    return f"-{dimension or 0}"
+
+
 def calculate_width_and_height(url_parts, options):
     """Appends width and height information to url"""
     width = options.get("width", 0)
-    has_width = width
     height = options.get("height", 0)
-    has_height = height
 
-    flip = options.get("flip", False)
-    flop = options.get("flop", False)
-
-    if flip:
-        width = width * -1
-    if flop:
-        height = height * -1
-
-    if not has_width and not has_height:
-        if flip:
-            width = "-0"
-        if flop:
-            height = "-0"
+    if options.get("flip", False):
+        width = _flipped(width)
+    if options.get("flop", False):
+        height = _flipped(height)
 
     if width or height:
         url_parts.append(f"{width}x{height}")

@@ -400,6 +400,26 @@ def test_flip_flop2():
     assert url == f"-200x-300/{IMAGE_URL}"
 
 
+def test_flip_with_only_a_height():
+    url = plain_image_url(flip=True, height=200, image_url=IMAGE_URL)
+
+    assert url == f"-0x200/{IMAGE_URL}"
+
+
+def test_flop_with_only_a_width():
+    url = plain_image_url(flop=True, width=300, image_url=IMAGE_URL)
+
+    assert url == f"300x-0/{IMAGE_URL}"
+
+
+def test_flip_flop_with_string_dimensions():
+    url = plain_image_url(
+        flip=True, flop=True, width="300", height="orig", image_url=IMAGE_URL
+    )
+
+    assert url == f"-300x-orig/{IMAGE_URL}"
+
+
 def test_horizontal_alignment():
     """test_horizontal_alignment
     Given
