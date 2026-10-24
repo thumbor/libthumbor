@@ -33,6 +33,7 @@ points that other applications can use to talk to thumbor safely.
   make coverage
   make flake8
   make pylint
+  make mypy
   ```
 
 - The test suite runs with `pytest` and collects coverage for the
@@ -46,6 +47,8 @@ points that other applications can use to talk to thumbor safely.
   [.flake8](/home/metal/work/libthumbor/.flake8).
 - **Static analysis:** `pylint`, configured in
   [.pylintrc](/home/metal/work/libthumbor/.pylintrc).
+- **Type checking:** `mypy` in strict mode, configured in
+  [pyproject.toml](/home/metal/work/libthumbor/pyproject.toml).
 - Primary workflow commands live in the
   [Makefile](/home/metal/work/libthumbor/Makefile); prefer them over ad hoc
   shell commands when possible.
@@ -56,6 +59,7 @@ points that other applications can use to talk to thumbor safely.
 libthumbor/              <- main package
   __init__.py            <- package exports
   crypto.py              <- secure URL generation helpers
+  py.typed               <- marks the package as typed for type checkers
   url.py                 <- URL composer and parsing utilities
 tests/                   <- pytest suite
   test_cryptourl.py      <- signing and encrypted URL behavior
@@ -63,6 +67,7 @@ tests/                   <- pytest suite
   test_url.py            <- URL parsing and composition
   test_url_composer.py   <- URL builder coverage
   test_generic_views.py  <- Django integration coverage
+  typecheck/usage.py     <- public API usage checked by mypy, not run by pytest
 README.md                <- project overview and usage example
 CONTRIBUTING.md          <- contribution workflow notes
 Makefile                 <- common setup, test, and lint tasks
