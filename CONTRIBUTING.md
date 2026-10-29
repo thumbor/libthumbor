@@ -77,3 +77,29 @@ git pull libthumbor master
 
 If that pull brings in changes, run the test suite again before opening your
 pull request.
+
+## Releasing
+
+Releases are published to PyPI by the `release` GitHub Actions workflow when a
+tag that matches the package version is pushed. To cut a release:
+
+1. Bump `version` in `pyproject.toml` and merge that change into `master`.
+2. Tag the merged commit with the same version, without a `v` prefix:
+
+   ```bash
+   git tag 2.0.3
+   git push origin 2.0.3
+   ```
+
+The workflow builds the sdist and wheel, fails if the tag does not match the
+version in `pyproject.toml`, and uploads the artifacts to PyPI through the
+`pypi` environment using trusted publishing, which also uploads attestations,
+so no API token is needed.
+
+Publishing depends on settings outside the repository. On PyPI, the project
+needs a trusted publisher for the `thumbor/libthumbor` repository, workflow
+`release.yml` and environment `pypi`. In the repository settings, the `pypi`
+environment should require reviewers and allow deployments only from tags
+that match the release pattern, and a tag ruleset should limit who can create
+those tags. Without that, anyone with write access can publish a release by
+pushing a tag at any commit.
