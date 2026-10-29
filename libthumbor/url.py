@@ -191,7 +191,7 @@ def url_for(**options):
     libthumbor nor thumbor supports anymore. Use CryptoURL.generate() instead.
     """
     warnings.warn(
-        "url_for() is deprecated and will be removed in libthumbor 3.0. It builds "
+        "url_for() is deprecated and will be removed in libthumbor 4.0. It builds "
         "the payload of the encrypted URL format thumbor no longer supports; use "
         "CryptoURL.generate() for signed URLs.",
         DeprecationWarning,
