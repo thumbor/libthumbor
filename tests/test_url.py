@@ -12,7 +12,7 @@ from unittest import TestCase
 
 import pytest
 
-from libthumbor.url import Url
+from libthumbor.url import Url, plain_image_url
 
 
 class UrlTestCase(TestCase):
@@ -187,6 +187,50 @@ class UrlTestCase(TestCase):
         for option in ("adaptive", "full"):
             with pytest.raises(ValueError, match="require fit_in"):
                 Url.generate_options(width=10, **{option: True})
+
+    def test_parse_decrypted_without_options(self):
+        parsed = Url.parse_decrypted("images.example.com/a.jpg")
+
+        assert parsed["trim"] is None
+        assert parsed["crop"] == {"left": 0, "top": 0, "right": 0, "bottom": 0}
+        assert parsed["image"] == "images.example.com/a.jpg"
+
+    def test_composer_parser_and_generate_options_agree(self):
+        for options in (
+            {},
+            {"debug": True, "meta": True, "trim": True, "smart": True},
+            {"trim": ("top-left", 10), "crop": ((10, 20), (30, 40))},
+            {"adaptive_full_fit_in": True, "width": 300, "flip": True},
+            {"width": "orig", "height": 200, "flop": True, "halign": "left"},
+            {"width": "007", "height": "0", "flop": True},
+            {"valign": "bottom", "filters": ["blur(2)", "grayscale()"]},
+        ):
+            path = plain_image_url(image_url="a.jpg", **options)
+            parsed = Url.parse_decrypted(path)
+            trim = parsed["trim"]
+            regenerated = Url.generate_options(
+                debug=parsed["debug"],
+                meta=parsed["meta"],
+                trim=None if trim is None else trim.partition(":")[2] or True,
+                crop_left=parsed["crop"]["left"],
+                crop_top=parsed["crop"]["top"],
+                crop_right=parsed["crop"]["right"],
+                crop_bottom=parsed["crop"]["bottom"],
+                fit_in=parsed["fit_in"],
+                adaptive=parsed["adaptive"],
+                full=parsed["full"],
+                width=parsed["width"],
+                height=parsed["height"],
+                horizontal_flip=parsed["horizontal_flip"],
+                vertical_flip=parsed["vertical_flip"],
+                halign=parsed["halign"],
+                valign=parsed["valign"],
+                smart=parsed["smart"],
+                filters=parsed["filters"],
+            )
+
+            assert parsed["image"] == "a.jpg"
+            assert "/".join(filter(None, (regenerated, "a.jpg"))) == path
 
     def test_parse_decrypted_with_more_digits_than_int_accepts(self):
         too_long = "9" * 5000
