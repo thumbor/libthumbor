@@ -15,7 +15,7 @@ import re
 import warnings
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
-from typing import Any, ClassVar, TypeGuard
+from typing import Any, ClassVar, Required, TypedDict, TypeGuard, Unpack
 
 AVAILABLE_HALIGN = ["left", "center", "right"]
 AVAILABLE_VALIGN = ["top", "middle", "bottom"]
@@ -45,6 +45,35 @@ KNOWN_OPTIONS = frozenset(
         "filters",
     )
 )
+
+
+class UrlOptions(TypedDict, total=False):
+    """The options CryptoURL.generate() and the URL composers accept."""
+
+    image_url: Required[str]
+    unsafe: bool
+    debug: bool
+    meta: bool
+    trim: bool | str | tuple[str | None, int | None] | None
+    crop: tuple[tuple[int, int], tuple[int, int]] | None
+    crop_left: int | None
+    crop_top: int | None
+    crop_right: int | None
+    crop_bottom: int | None
+    fit_in: bool
+    full_fit_in: bool
+    adaptive_fit_in: bool
+    adaptive_full_fit_in: bool
+    width: int | str
+    height: int | str
+    flip: bool
+    flop: bool
+    horizontal_flip: bool
+    vertical_flip: bool
+    halign: str
+    valign: str
+    smart: bool
+    filters: str | Iterable[str] | None
 
 
 FIT_IN_SEGMENTS = {
@@ -297,7 +326,7 @@ def _build_path(
     )
 
 
-def url_for(**options: Any) -> str:
+def url_for(**options: Unpack[UrlOptions]) -> str:
     """Returns the options path with the image URL replaced by its MD5.
 
     Deprecated: this was the payload of the encrypted URL format that neither
@@ -320,23 +349,51 @@ def url_for(**options: Any) -> str:
     return "/".join(url_parts)
 
 
-def unsafe_url(**options: Any) -> str:
+def unsafe_url(**options: Unpack[UrlOptions]) -> str:
     """Returns the unsafe url with the specified options"""
     return f"unsafe/{plain_image_url(**options)}"
 
 
-def plain_image_url(**options: Any) -> str:
+def plain_image_url(**options: Unpack[UrlOptions]) -> str:
     url_parts = get_url_parts(**options)
     url_parts.append(options["image_url"])
 
     return "/".join(url_parts)
 
 
-def get_url_parts(**options: Any) -> list[str]:
+def get_url_parts(**options: Unpack[UrlOptions]) -> list[str]:
     if not options.get("image_url"):
         raise ValueError("The image_url argument is mandatory.")
 
     return _build_path(options, _fit_in).segments()
+
+
+class ParsedCrop(TypedDict):
+    left: int
+    top: int
+    right: int
+    bottom: int
+
+
+class ParsedUrl(TypedDict):
+    """The options Url.parse_decrypted() reads from a thumbor path."""
+
+    debug: bool
+    meta: bool
+    trim: str | None
+    crop: ParsedCrop
+    adaptive: bool
+    full: bool
+    fit_in: bool
+    width: int | str
+    height: int | str
+    horizontal_flip: bool
+    vertical_flip: bool
+    halign: str
+    valign: str
+    smart: bool
+    filters: str
+    image: str
 
 
 class Url:
@@ -377,7 +434,7 @@ class Url:
         return "".join(reg)
 
     @classmethod
-    def parse_decrypted(cls, url: str) -> dict[str, Any] | None:
+    def parse_decrypted(cls, url: str) -> ParsedUrl | None:
         """Returns the options in a thumbor path, or None if it cannot be parsed"""
         if cls.compiled_regex:
             reg = cls.compiled_regex
@@ -426,18 +483,17 @@ class Url:
         )
 
     @staticmethod
-    def _parsed(path: _Path, image: str) -> dict[str, Any]:
+    def _parsed(path: _Path, image: str) -> ParsedUrl:
         trim = None
         if path.trim is not None:
             trim = f"trim:{path.trim}" if path.trim else "trim"
         fit_in = path.fit_in or ""
+        left, top, right, bottom = path.crop or (0, 0, 0, 0)
         return {
             "debug": path.debug,
             "meta": path.meta,
             "trim": trim,
-            "crop": dict(
-                zip(("left", "top", "right", "bottom"), path.crop or (0, 0, 0, 0))
-            ),
+            "crop": {"left": left, "top": top, "right": right, "bottom": bottom},
             "adaptive": fit_in.startswith("adaptive-"),
             "full": "full-" in fit_in,
             "fit_in": bool(fit_in),
