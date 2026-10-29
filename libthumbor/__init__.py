@@ -8,7 +8,7 @@
 """libthumbor is the library used to access thumbor's images in python"""
 
 from libthumbor.crypto import CryptoURL  # NOQA
-from libthumbor.url import Url  # NOQA
+from libthumbor.url import ParsedUrl, Url, UrlOptions  # NOQA
 from libthumbor.url_signers.base64_hmac_sha1 import UrlSigner as Signer  # NOQA
 
-__all__ = ["CryptoURL", "Signer", "Url"]
+__all__ = ["CryptoURL", "ParsedUrl", "Signer", "Url", "UrlOptions"]

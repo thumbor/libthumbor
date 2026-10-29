@@ -14,6 +14,7 @@ import pytest
 
 from libthumbor import Signer
 from libthumbor.crypto import CryptoURL
+from libthumbor.url import KNOWN_OPTIONS, UrlOptions
 
 IMAGE_URL = "my.server.com/some/path/to/image.jpg"
 KEY = b"my-security-key"
@@ -135,6 +136,12 @@ def test_unknown_options_are_ignored_with_a_deprecation_warning():
 
     assert url == crypto.generate(image_url=IMAGE_URL)
     assert record[0].filename == __file__
+
+
+def test_known_options_are_the_keys_of_url_options():
+    keys = UrlOptions.__required_keys__ | UrlOptions.__optional_keys__
+
+    assert KNOWN_OPTIONS == keys
 
 
 def test_options_passed_by_thumbor_url():
