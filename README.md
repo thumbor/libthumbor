@@ -13,6 +13,7 @@ logic in one place, and reuse the same URL-building rules across services.
 - Parse decrypted thumbor paths with `Url.parse_decrypted()`
 - Validate signatures with the bundled signer implementation
 - Use the included Django view for simple URL generation endpoints
+- Type hints for the public API, checked by mypy (`py.typed`)
 
 ## Requirements
 
@@ -312,6 +313,7 @@ make black
 make flake8
 make isort-check
 make pylint
+make mypy
 make pre-commit
 ```
 

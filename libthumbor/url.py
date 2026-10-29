@@ -13,7 +13,9 @@ import hashlib
 import numbers
 import re
 import warnings
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
+from typing import Any, ClassVar, TypeGuard
 
 AVAILABLE_HALIGN = ["left", "center", "right"]
 AVAILABLE_VALIGN = ["top", "middle", "bottom"]
@@ -56,11 +58,11 @@ FALSE_VALUES = frozenset(("0", "false", "no", "off", ""))
 TRIM_PATTERN = re.compile(r"(?:(?:top-left|bottom-right)(?::\d+)?|\d+)")
 
 
-def _int_or_0(value):
+def _int_or_0(value: str | None) -> int:
     return 0 if value is None else int(value)
 
 
-def read_flag(options, name):
+def read_flag(options: Mapping[str, Any], name: str) -> bool:
     """Reads a boolean option, accepting the strings the Django view accepts."""
     value = options.get(name, False)
     if not isinstance(value, str):
@@ -73,39 +75,45 @@ def read_flag(options, name):
     raise ValueError(f"The {name} option must be a boolean.")
 
 
-def _is_digits(value):
+def _is_digits(value: object) -> TypeGuard[str]:
     return isinstance(value, str) and value.isascii() and value.isdigit()
 
 
-def _is_integer(value):
+def _is_integer(value: object) -> TypeGuard[numbers.Integral]:
     return isinstance(value, numbers.Integral) and not isinstance(value, bool)
 
 
-def _dimension(options, name):
-    value = options.get(name)
+def _dimension(options: Mapping[str, Any], name: str) -> int | str:
+    value: object = options.get(name)
     if value is None:
         return 0
     if _is_integer(value) or _is_digits(value):
         return int(value)
     if value == "orig":
-        return value
+        return "orig"
     raise ValueError(f'The {name} option must be an integer or "orig".')
 
 
-def _signed(dimension, flipped):
+def _parsed_dimension(value: str | None) -> int | str:
+    if value == "orig":
+        return "orig"
+    return _int_or_0(value)
+
+
+def _signed(dimension: int | str, flipped: bool) -> tuple[int | str, bool]:
     # A negative number has always meant a flipped dimension.
     if isinstance(dimension, int) and dimension < 0:
         return -dimension, not flipped
     return dimension, flipped
 
 
-def _crop_value(value):
-    if (_is_integer(value) and value >= 0) or _is_digits(value):
+def _crop_value(value: object) -> int:
+    if (_is_integer(value) and int(value) >= 0) or _is_digits(value):
         return int(value)
     raise ValueError("The crop values must be non-negative integers.")
 
 
-def _crop(crop):
+def _crop(crop: Any) -> tuple[int, int, int, int] | None:
     if not crop:
         return None
     try:
@@ -114,11 +122,16 @@ def _crop(crop):
         raise ValueError(
             "The crop option must be a ((left, top), (right, bottom)) pair."
         ) from error
-    sides = tuple(_crop_value(value) for value in (left, top, right, bottom))
+    sides = (
+        _crop_value(left),
+        _crop_value(top),
+        _crop_value(right),
+        _crop_value(bottom),
+    )
     return sides if any(sides) else None
 
 
-def _trim(trim):
+def _trim(trim: object) -> str | None:
     """Returns the text after "trim:", "" for a plain trim, or None for no trim."""
     if not trim:
         return None
@@ -139,7 +152,7 @@ def _trim(trim):
     return body
 
 
-def _filters(filters):
+def _filters(filters: str | Iterable[str] | None) -> str | None:
     if not filters:
         return None
     if isinstance(filters, str):
@@ -150,7 +163,7 @@ def _filters(filters):
         raise ValueError("The filters option must be a string or a list.") from error
 
 
-def _check_alignment(halign, valign):
+def _check_alignment(halign: str, valign: str) -> None:
     if halign not in AVAILABLE_HALIGN:
         raise ValueError(
             'Only "left", "center" and "right" are'
@@ -185,7 +198,7 @@ class _Path:  # pylint: disable=too-many-instance-attributes
     smart: bool = False
     filters: str | None = None
 
-    def segments(self):
+    def segments(self) -> list[str]:
         parts = [name for name in ("debug", "meta") if getattr(self, name)]
         if self.trim is not None:
             parts.append(f"trim:{self.trim}" if self.trim else "trim")
@@ -210,7 +223,7 @@ class _Path:  # pylint: disable=too-many-instance-attributes
         return parts
 
 
-def _resolve_aliases(options):
+def _resolve_aliases(options: Mapping[str, Any]) -> dict[str, Any]:
     """Maps the Url.generate_options names, which thumbor-url passes, onto ours."""
     options = dict(options)
     if read_flag(options, "horizontal_flip"):
@@ -224,7 +237,7 @@ def _resolve_aliases(options):
     return options
 
 
-def _fit_in(options):
+def _fit_in(options: Mapping[str, Any]) -> str | None:
     segments = [
         segment for name, segment in FIT_IN_SEGMENTS.items() if read_flag(options, name)
     ]
@@ -240,7 +253,7 @@ def _fit_in(options):
     return segments[0] if segments else None
 
 
-def _fit_in_with_modifiers(options):
+def _fit_in_with_modifiers(options: Mapping[str, Any]) -> str | None:
     """Reads fit-in the way Url.generate_options spells it: a flag plus modifiers."""
     adaptive = read_flag(options, "adaptive")
     full = read_flag(options, "full")
@@ -251,7 +264,9 @@ def _fit_in_with_modifiers(options):
     return "adaptive-" * adaptive + "full-" * full + "fit-in"
 
 
-def _build_path(options, read_fit_in):
+def _build_path(
+    options: Mapping[str, Any], read_fit_in: Callable[[Mapping[str, Any]], str | None]
+) -> _Path:
     options = _resolve_aliases(options)
     debug = read_flag(options, "debug")
     meta = read_flag(options, "meta")
@@ -282,7 +297,7 @@ def _build_path(options, read_fit_in):
     )
 
 
-def url_for(**options):
+def url_for(**options: Any) -> str:
     """Returns the options path with the image URL replaced by its MD5.
 
     Deprecated: this was the payload of the encrypted URL format that neither
@@ -305,19 +320,19 @@ def url_for(**options):
     return "/".join(url_parts)
 
 
-def unsafe_url(**options):
+def unsafe_url(**options: Any) -> str:
     """Returns the unsafe url with the specified options"""
     return f"unsafe/{plain_image_url(**options)}"
 
 
-def plain_image_url(**options):
+def plain_image_url(**options: Any) -> str:
     url_parts = get_url_parts(**options)
     url_parts.append(options["image_url"])
 
     return "/".join(url_parts)
 
 
-def get_url_parts(**options):
+def get_url_parts(**options: Any) -> list[str]:
     if not options.get("image_url"):
         raise ValueError("The image_url argument is mandatory.")
 
@@ -339,10 +354,10 @@ class Url:
     filters = r"(?:filters:(?P<filters>.+?\))/)?"
     image = r"(?P<image>.+)"
 
-    compiled_regex = None
+    compiled_regex: ClassVar[re.Pattern[str] | None] = None
 
     @classmethod
-    def regex(cls, has_unsafe_or_hash=True):
+    def regex(cls, has_unsafe_or_hash: bool = True) -> str:
         reg = ["/?"]
 
         if has_unsafe_or_hash:
@@ -362,7 +377,7 @@ class Url:
         return "".join(reg)
 
     @classmethod
-    def parse_decrypted(cls, url):
+    def parse_decrypted(cls, url: str) -> dict[str, Any] | None:
         """Returns the options in a thumbor path, or None if it cannot be parsed"""
         if cls.compiled_regex:
             reg = cls.compiled_regex
@@ -374,31 +389,34 @@ class Url:
         if not result:
             return None
 
-        groups = result.groupdict()
         try:
-            path = cls._path_from_match(groups)
+            path = cls._path_from_match(result.groupdict())
         except ValueError:
             return None
-        return cls._parsed(path, groups["image"])
+        return cls._parsed(path, result.group("image"))
 
     @staticmethod
-    def _path_from_match(groups):
-        crop = [groups[f"crop_{side}"] for side in ("left", "top", "right", "bottom")]
+    def _path_from_match(groups: Mapping[str, str | None]) -> _Path:
         fit_in = None
         if groups["fit_in"]:
             fit_in = f"{groups['adaptive'] or ''}{groups['full'] or ''}fit-in"
-        width, height = (
-            groups[name] if groups[name] == "orig" else _int_or_0(groups[name])
-            for name in ("width", "height")
-        )
+        trim = groups["trim"]
+        crop = None
+        if groups["crop_left"] is not None:
+            crop = (
+                _int_or_0(groups["crop_left"]),
+                _int_or_0(groups["crop_top"]),
+                _int_or_0(groups["crop_right"]),
+                _int_or_0(groups["crop_bottom"]),
+            )
         return _Path(
             debug=groups["debug"] == "debug",
             meta=groups["meta"] == "meta",
-            trim=None if groups["trim"] is None else groups["trim"].partition(":")[2],
-            crop=None if crop[0] is None else tuple(int(side) for side in crop),
+            trim=None if trim is None else trim.partition(":")[2],
+            crop=crop,
             fit_in=fit_in,
-            width=width,
-            height=height,
+            width=_parsed_dimension(groups["width"]),
+            height=_parsed_dimension(groups["height"]),
             horizontal_flip=groups["horizontal_flip"] == "-",
             vertical_flip=groups["vertical_flip"] == "-",
             halign=groups["halign"] or "center",
@@ -408,7 +426,7 @@ class Url:
         )
 
     @staticmethod
-    def _parsed(path, image):
+    def _parsed(path: _Path, image: str) -> dict[str, Any]:
         trim = None
         if path.trim is not None:
             trim = f"trim:{path.trim}" if path.trim else "trim"
@@ -437,25 +455,25 @@ class Url:
     @classmethod  # NOQA
     def generate_options(  # pylint: disable=too-many-positional-arguments
         cls,
-        debug=False,
-        width=0,
-        height=0,
-        smart=False,
-        meta=False,
-        trim=None,
-        adaptive=False,
-        full=False,
-        fit_in=False,
-        horizontal_flip=False,
-        vertical_flip=False,
-        halign="center",
-        valign="middle",
-        crop_left=None,
-        crop_top=None,
-        crop_right=None,
-        crop_bottom=None,
-        filters=None,
-    ):
+        debug: bool = False,
+        width: int | str = 0,
+        height: int | str = 0,
+        smart: bool = False,
+        meta: bool = False,
+        trim: bool | str | tuple[str | None, int | None] | None = None,
+        adaptive: bool = False,
+        full: bool = False,
+        fit_in: bool = False,
+        horizontal_flip: bool = False,
+        vertical_flip: bool = False,
+        halign: str = "center",
+        valign: str = "middle",
+        crop_left: int | None = None,
+        crop_top: int | None = None,
+        crop_right: int | None = None,
+        crop_bottom: int | None = None,
+        filters: str | Iterable[str] | None = None,
+    ) -> str:
         options = {
             "debug": debug,
             "width": width,
