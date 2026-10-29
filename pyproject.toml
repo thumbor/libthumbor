@@ -1,6 +1,6 @@
 [project]
 name = "libthumbor"
-version = "2.0.2"
+version = "3.0.0"
 description = "libthumbor is the python extension to generate thumbor URLs"
 authors = [{ name = "Bernardo Heynemann", email = "heynemann@gmail.com" }]
 readme = "README.md"
