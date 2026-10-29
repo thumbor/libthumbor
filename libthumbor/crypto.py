@@ -9,9 +9,15 @@
 
 import warnings
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Unpack
 
-from libthumbor.url import KNOWN_OPTIONS, plain_image_url, read_flag, unsafe_url
+from libthumbor.url import (
+    KNOWN_OPTIONS,
+    UrlOptions,
+    plain_image_url,
+    read_flag,
+    unsafe_url,
+)
 from libthumbor.url_signers.base64_hmac_sha1 import UrlSigner
 
 
@@ -33,7 +39,7 @@ class CryptoURL:
 
         return f"/{signature}/{url}"
 
-    def generate(self, **options: Any) -> str:
+    def generate(self, **options: Unpack[UrlOptions]) -> str:
         """Generates an encrypted URL with the specified options"""
 
         unknown = sorted(options.keys() - KNOWN_OPTIONS)

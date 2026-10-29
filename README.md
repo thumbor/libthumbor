@@ -186,6 +186,14 @@ thumbor-compatible URL composer:
 - `debug`
 - `unsafe`
 
+Type checkers read these options from `libthumbor.UrlOptions`, so a misspelled
+option or a missing `image_url` is reported before the URL is signed, and
+`Url.parse_decrypted()` returns a `libthumbor.ParsedUrl`. Annotate an options
+dict built ahead of time as `UrlOptions`, or as `dict[str, Any]` when it does
+not carry `image_url`: mypy infers an unannotated `{"width": 300}` as
+`dict[str, int]` and rejects unpacking it, since an `int` does not fit the
+other options.
+
 ## Signature Utilities
 
 The package also exposes the bundled signer implementation:
