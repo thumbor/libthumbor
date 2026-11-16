@@ -38,7 +38,7 @@ class CryptoURL:
         if unknown:
             warnings.warn(
                 f"Ignoring unknown thumbor URL options: {', '.join(unknown)}. "
-                "Unknown options will raise an error in libthumbor 3.0.",
+                "Unknown options will raise an error in libthumbor 4.0.",
                 DeprecationWarning,
                 stacklevel=2,
             )
