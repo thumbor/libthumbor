@@ -44,6 +44,7 @@ make black
 make flake8
 make isort-check
 make pylint
+make mypy
 ```
 
 The default environment uses Django 5.2 LTS. To run the suite against Django

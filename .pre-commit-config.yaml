@@ -35,3 +35,12 @@ repos:
         language: system
         args: [--rcfile=./.pylintrc, libthumbor, tests]
         pass_filenames: false
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.4.0
+    hooks:
+      - id: mypy
+        entry: uv run --no-sync mypy
+        language: system
+        # mirrors-mypy adds --ignore-missing-imports by default; pyproject decides.
+        args: []
+        pass_filenames: false
