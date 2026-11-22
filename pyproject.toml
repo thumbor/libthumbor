@@ -22,6 +22,12 @@ dependencies = []
 [project.optional-dependencies]
 django = ["django>=5.2,<7"]
 
+[project.urls]
+Homepage = "https://github.com/thumbor/libthumbor"
+Repository = "https://github.com/thumbor/libthumbor"
+Issues = "https://github.com/thumbor/libthumbor/issues"
+"Release Notes" = "https://github.com/thumbor/libthumbor/releases"
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.2,<10",
